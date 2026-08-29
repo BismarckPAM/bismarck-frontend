@@ -27,13 +27,18 @@ export const AppLayout: React.FC = () => {
         </div>
 
         <nav className="pam-nav-links" aria-label="Main Navigation">
-          <NavLink to="/users" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink
+            to="/users"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            aria-label="Identities and Users"
+          >
             <Users size={18} />
             <span>Identities & Users</span>
           </NavLink>
           <NavLink
             to="/resources"
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            aria-label="Privileged Resources"
           >
             <Server size={18} />
             <span>Privileged Resources</span>
@@ -41,13 +46,17 @@ export const AppLayout: React.FC = () => {
         </nav>
 
         <div className="pam-header-user-section">
-          <div className="user-profile-chip">
-            <div className="user-avatar-circle">
+          <div className="user-profile-chip" data-testid="user-profile-chip">
+            <div className="user-avatar-circle" aria-hidden="true">
               <UserIcon size={16} />
             </div>
             <div className="user-details">
-              <span className="user-email">{user?.email || 'Administrator'}</span>
-              <span className="user-role-badge">Admin</span>
+              <span className="user-email" data-testid="user-display-name">
+                {user?.fullName || user?.email || 'Administrator'}
+              </span>
+              <span className="user-role-badge" data-testid="user-display-role">
+                {user?.role || 'Admin'}
+              </span>
             </div>
           </div>
 
@@ -56,6 +65,7 @@ export const AppLayout: React.FC = () => {
             className="logout-button"
             title="Sign out of Bismarck PAM"
             aria-label="Logout"
+            data-testid="logout-btn"
           >
             <LogOut size={18} />
             <span>Logout</span>
