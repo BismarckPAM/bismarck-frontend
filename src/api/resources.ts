@@ -1,4 +1,4 @@
-import apiClient from './client';
+import { resourceClient } from './client';
 import type { Resource } from '../types/resource';
 
 /**
@@ -6,19 +6,9 @@ import type { Resource } from '../types/resource';
  * Endpoint: GET /api/resources
  */
 export const getResourcesApi = async (): Promise<Resource[]> => {
-  const response = await apiClient.get<Resource[] | { resources?: Resource[]; data?: Resource[] }>(
-    '/api/resources',
-  );
-
-  // Normalize response to always return Resource[]
-  if (Array.isArray(response.data)) {
-    return response.data;
+  const response = await resourceClient.get<Resource[]>('/api/resources');
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from Resource Service: expected an array of resources');
   }
-  if (response.data && Array.isArray(response.data.resources)) {
-    return response.data.resources;
-  }
-  if (response.data && Array.isArray(response.data.data)) {
-    return response.data.data;
-  }
-  return [];
+  return response.data;
 };

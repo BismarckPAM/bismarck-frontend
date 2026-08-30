@@ -1,4 +1,4 @@
-import apiClient from './client';
+import { identityClient } from './client';
 import type { User } from '../types/auth';
 
 /**
@@ -6,19 +6,9 @@ import type { User } from '../types/auth';
  * Endpoint: GET /api/identity/users
  */
 export const getUsersApi = async (): Promise<User[]> => {
-  const response = await apiClient.get<User[] | { users?: User[]; data?: User[] }>(
-    '/api/identity/users',
-  );
-
-  // Normalize response to always return User[]
-  if (Array.isArray(response.data)) {
-    return response.data;
+  const response = await identityClient.get<User[]>('/api/identity/users');
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from Identity Service: expected an array of users');
   }
-  if (response.data && Array.isArray(response.data.users)) {
-    return response.data.users;
-  }
-  if (response.data && Array.isArray(response.data.data)) {
-    return response.data.data;
-  }
-  return [];
+  return response.data;
 };

@@ -50,40 +50,57 @@ export const clearAuthToken = (): void => {
   }
 };
 
-const baseURL = import.meta.env.VITE_IDENTITY_API_URL || '';
+const identityBaseURL = import.meta.env.VITE_IDENTITY_API_URL || '';
+const resourceBaseURL = import.meta.env.VITE_RESOURCE_API_URL || '';
 
-export const apiClient: AxiosInstance = axios.create({
-  baseURL,
+export const identityClient: AxiosInstance = axios.create({
+  baseURL: identityBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 15000,
 });
 
-// Request Interceptor: Attach Bearer token to all outgoing requests
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = getAuthToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+export const resourceClient: AxiosInstance = axios.create({
+  baseURL: resourceBaseURL,
+  headers: {
+    'Content-Type': 'application/json',
   },
-  (error) => Promise.reject(error),
-);
+  timeout: 15000,
+});
 
-// Response Interceptor: Handle 401 Unauthorized by clearing token & redirecting
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      clearAuthToken();
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login';
+const attachInterceptors = (client: AxiosInstance): void => {
+  // Request Interceptor: Attach Bearer token to all outgoing requests
+  client.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+      const token = getAuthToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
-    }
-    return Promise.reject(error);
-  },
-);
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
 
-export default apiClient;
+  // Response Interceptor: Handle 401 Unauthorized by clearing token & redirecting
+  client.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        clearAuthToken();
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
+      }
+      return Promise.reject(error);
+    },
+  );
+};
+
+// Apply shared interceptors to both microservice clients
+attachInterceptors(identityClient);
+attachInterceptors(resourceClient);
+
+// Backward compatibility alias & default export
+export const apiClient = identityClient;
+export default identityClient;
