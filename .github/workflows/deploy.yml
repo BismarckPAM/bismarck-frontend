@@ -1,4 +1,4 @@
-name: Build and Push Frontend to ACR
+name: Bismarck Frontend CI/CD
 
 on:
   push:
@@ -6,32 +6,172 @@ on:
       - main
       - deploy/production
 
+  pull_request:
+    branches:
+      - main
+      - deploy/production
+
+
 jobs:
+
+  # ============================================================
+  # 1. CI - Lint, Format, Test & Build
+  # ============================================================
+
+  test-and-build:
+    name: Lint, Test & Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # --------------------------------------------------------
+      # Checkout
+      # --------------------------------------------------------
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+
+      # --------------------------------------------------------
+      # Setup Node.js
+      # --------------------------------------------------------
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+
+      # --------------------------------------------------------
+      # Install Dependencies
+      #
+      # npm ci provides a clean, reproducible installation
+      # based on package-lock.json.
+      # --------------------------------------------------------
+
+      - name: Install Dependencies
+        run: npm ci
+
+
+      # --------------------------------------------------------
+      # ESLint
+      #
+      # Checks JavaScript/TypeScript/React code for:
+      # - errors
+      # - unused code
+      # - invalid React patterns
+      # - hook issues
+      # - other configured lint rules
+      # --------------------------------------------------------
+
+      - name: Run ESLint
+        run: npm run lint
+
+
+      # --------------------------------------------------------
+      # Prettier
+      #
+      # Verifies that the repository follows the configured
+      # formatting rules without modifying any files.
+      # --------------------------------------------------------
+
+      - name: Check Formatting
+        run: npm run format:check
+
+
+      # --------------------------------------------------------
+      # Unit / Component Tests
+      #
+      # Uses Vitest in non-interactive CI mode.
+      # --------------------------------------------------------
+
+      - name: Run Tests
+        run: npm run test:run
+
+
+      # --------------------------------------------------------
+      # Production Build
+      #
+      # Your build script already performs:
+      #
+      #   tsc -b
+      #   ↓
+      #   vite build
+      #
+      # Therefore this also catches TypeScript errors.
+      # --------------------------------------------------------
+
+      - name: Build Frontend
+        run: npm run build
+
+
+  # ============================================================
+  # 2. CD - Build & Push Docker Image to ACR
+  # ============================================================
+
   build-and-push:
     name: Build & Push Frontend Image
     runs-on: ubuntu-latest
 
+    needs:
+      - test-and-build
+
+    # Only push Docker images for actual pushes to main or
+    # deploy/production.
+    #
+    # Pull requests run CI but never push to ACR.
+    if: >
+      github.event_name == 'push' &&
+      (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/deploy/production'
+      )
+
     steps:
+
+      # --------------------------------------------------------
+      # Checkout
+      # --------------------------------------------------------
+
       - name: Checkout Code
         uses: actions/checkout@v4
+
+
+      # --------------------------------------------------------
+      # Setup Docker Buildx
+      # --------------------------------------------------------
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Azure Container Registry (ACR)
+
+      # --------------------------------------------------------
+      # Login to Azure Container Registry
+      # --------------------------------------------------------
+
+      - name: Log in to Azure Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and Push Docker Image
+
+      # --------------------------------------------------------
+      # Build & Push Docker Image
+      # --------------------------------------------------------
+
+      - name: Build and Push Frontend Image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+
           tags: |
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend-ui:${{ github.sha }}
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend-ui:latest
+
+          # GitHub Actions Docker layer cache
           cache-from: type=gha
           cache-to: type=gha,mode=max
