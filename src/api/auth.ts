@@ -6,6 +6,9 @@ import type { LoginRequest, LoginResponse } from '../types/auth';
  * Endpoint: POST /api/identity/auth/login
  */
 export const loginApi = async (credentials: LoginRequest): Promise<LoginResponse> => {
-  const response = await identityClient.post<LoginResponse>('/api/identity/auth/login', credentials);
+  const response = await identityClient.post<LoginResponse>(
+    '/api/identity/auth/login',
+    credentials,
+  );
   return response.data;
 };

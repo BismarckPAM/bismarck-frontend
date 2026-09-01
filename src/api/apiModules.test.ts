@@ -99,7 +99,9 @@ describe('API Module functions', () => {
     });
 
     it('throws an error when the Identity Service response is not an array', async () => {
-      vi.mocked(identityClient.get).mockResolvedValueOnce({ data: { message: 'Malformed response' } });
+      vi.mocked(identityClient.get).mockResolvedValueOnce({
+        data: { message: 'Malformed response' },
+      });
       await expect(getUsersApi()).rejects.toThrow(
         'Unexpected response from Identity Service: expected an array of users',
       );
