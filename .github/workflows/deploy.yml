@@ -81,7 +81,6 @@ jobs:
       - name: Run Tests
         run: npm run test:run
 
-    
       - name: Build Frontend
         env:
           VITE_IDENTITY_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io

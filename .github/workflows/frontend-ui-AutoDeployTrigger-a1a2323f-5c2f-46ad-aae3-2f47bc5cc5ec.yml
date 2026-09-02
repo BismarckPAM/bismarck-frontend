@@ -4,19 +4,18 @@ name: Trigger auto deployment for frontend-ui
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ deploy/production ]
+    branches: [deploy/production]
     paths:
-    - '**'
-    - '.github/workflows/frontend-ui-AutoDeployTrigger-a1a2323f-5c2f-46ad-aae3-2f47bc5cc5ec.yml'
+      - '**'
+      - '.github/workflows/frontend-ui-AutoDeployTrigger-a1a2323f-5c2f-46ad-aae3-2f47bc5cc5ec.yml'
 
-  # Allow manual trigger 
-  workflow_dispatch:      
+  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       id-token: write #This is required for requesting the OIDC JWT Token
       contents: read #Required when GH token is used to authenticate with private repo
 
@@ -45,5 +44,3 @@ jobs:
           imageToBuild: bismarckregistry.azurecr.io/frontend-ui:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
-
-
