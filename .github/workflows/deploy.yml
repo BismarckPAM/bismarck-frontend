@@ -81,19 +81,10 @@ jobs:
       - name: Run Tests
         run: npm run test:run
 
-      # --------------------------------------------------------
-      # Production Build
-      #
-      # Your build script already performs:
-      #
-      #   tsc -b
-      #   ↓
-      #   vite build
-      #
-      # Therefore this also catches TypeScript errors.
-      # --------------------------------------------------------
-
+    
       - name: Build Frontend
+        env:
+          VITE_IDENTITY_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
         run: npm run build
 
   # ============================================================
