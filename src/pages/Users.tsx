@@ -43,10 +43,10 @@ export const Users: React.FC = () => {
   // Client-side filter
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchQuery.toLowerCase());
+      (user.fullName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.email ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.department ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.role ?? '').toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesRole = selectedRole === 'ALL' || user.role === selectedRole;
 
