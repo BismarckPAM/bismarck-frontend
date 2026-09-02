@@ -50,11 +50,14 @@ export const clearAuthToken = (): void => {
   }
 };
 
-const identityBaseURL = import.meta.env.VITE_IDENTITY_API_URL || '';
-const resourceBaseURL = import.meta.env.VITE_RESOURCE_API_URL || '';
+// The API Gateway is the single public entry point for every backend service.
+// Both the Identity and Resource clients therefore share one base URL
+// (VITE_API_URL), and the gateway routes /api/identity/* and /api/resource/*
+// downstream. This is baked in at build time by the Dockerfile.
+const apiBaseURL = import.meta.env.VITE_API_URL || '';
 
 export const identityClient: AxiosInstance = axios.create({
-  baseURL: identityBaseURL,
+  baseURL: apiBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -62,7 +65,7 @@ export const identityClient: AxiosInstance = axios.create({
 });
 
 export const resourceClient: AxiosInstance = axios.create({
-  baseURL: resourceBaseURL,
+  baseURL: apiBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },

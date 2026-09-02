@@ -83,7 +83,7 @@ jobs:
 
       - name: Build Frontend
         env:
-          VITE_IDENTITY_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+          VITE_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
         run: npm run build
 
   # ============================================================
@@ -143,6 +143,12 @@ jobs:
         with:
           context: .
           push: true
+
+          # VITE_API_URL must be passed as a build-arg so the value is baked
+          # into the Vite production bundle inside the Docker build (the
+          # Dockerfile declares ARG VITE_API_URL for this purpose).
+          build-args: |
+            VITE_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
 
           tags: |
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend-ui:${{ github.sha }}
