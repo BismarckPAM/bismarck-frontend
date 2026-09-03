@@ -46,7 +46,7 @@ export const Resources: React.FC = () => {
   const uniqueEnvironments = Array.from(
     new Set(resources.map((r) => r.environment).filter(Boolean)),
   );
-// Client-side filtering
+  // Client-side filtering
   const filteredResources = resources.filter((res) => {
     const q = (searchQuery || '').toLowerCase();
 
