@@ -46,21 +46,22 @@ export const Resources: React.FC = () => {
   const uniqueEnvironments = Array.from(
     new Set(resources.map((r) => r.environment).filter(Boolean)),
   );
-
-  // Client-side filtering
+// Client-side filtering
   const filteredResources = resources.filter((res) => {
+    const q = (searchQuery || '').toLowerCase();
+
     const matchesSearch =
-      res.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      res.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      res.environment.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      res.criticality.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (res.description && res.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (res.ipAddress && res.ipAddress.toLowerCase().includes(searchQuery.toLowerCase()));
+      Boolean(res.name?.toLowerCase().includes(q)) ||
+      Boolean(res.type?.toLowerCase().includes(q)) ||
+      Boolean(res.environment?.toLowerCase().includes(q)) ||
+      Boolean(res.criticality?.toLowerCase().includes(q)) ||
+      Boolean(res.description?.toLowerCase().includes(q)) ||
+      Boolean(res.ipAddress?.toLowerCase().includes(q));
 
     const matchesEnv = selectedEnv === 'ALL' || res.environment === selectedEnv;
     const matchesCriticality =
       selectedCriticality === 'ALL' ||
-      res.criticality.toUpperCase() === selectedCriticality.toUpperCase();
+      res.criticality?.toUpperCase() === selectedCriticality?.toUpperCase();
 
     return matchesSearch && matchesEnv && matchesCriticality;
   });
