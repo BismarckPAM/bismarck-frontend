@@ -3,12 +3,10 @@ name: Bismarck Frontend CI/CD
 on:
   push:
     branches:
-      - main
       - deploy/production
 
   pull_request:
     branches:
-      - main
       - deploy/production
 
 jobs:
