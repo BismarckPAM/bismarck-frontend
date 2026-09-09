@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_IDENTITY_API_URL: string;
-  readonly VITE_RESOURCE_API_URL: string;
+  // Single API Gateway base URL shared by all backend services.
+  readonly VITE_API_URL: string;
 }
 
 interface ImportMeta {
