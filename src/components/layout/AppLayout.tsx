@@ -1,6 +1,14 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Shield, Users, Server, LogOut, User as UserIcon } from 'lucide-react';
+import {
+  Shield,
+  Users,
+  Server,
+  LogOut,
+  User as UserIcon,
+  ListChecks,
+  ScanSearch,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const AppLayout: React.FC = () => {
@@ -42,6 +50,22 @@ export const AppLayout: React.FC = () => {
           >
             <Server size={18} />
             <span>Privileged Resources</span>
+          </NavLink>
+          <NavLink
+            to="/policies"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            aria-label="Access policies"
+          >
+            <ListChecks size={18} />
+            <span>Access Policies</span>
+          </NavLink>
+          <NavLink
+            to="/access-check"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            aria-label="Access check simulator"
+          >
+            <ScanSearch size={18} />
+            <span>Check Simulator</span>
           </NavLink>
         </nav>
 

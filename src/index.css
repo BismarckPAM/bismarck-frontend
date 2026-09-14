@@ -427,7 +427,6 @@ body {
   color: var(--text-muted);
   line-height: 1.4;
 }
-
 /* ==========================================================================
    App Layout & Header
    ========================================================================== */
@@ -1354,6 +1353,81 @@ body {
   color: #cbd5e1;
 }
 
+.primary-action-btn,
+.secondary-action-btn,
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  min-height: 38px;
+  padding: 0 13px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.primary-action-btn { background: var(--accent-cyan); border-color: var(--accent-cyan); color: #06232a; }
+.primary-action-btn:hover { background: #22d3ee; }
+.secondary-action-btn:hover,
+.icon-button:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.primary-action-btn:disabled,
+.secondary-action-btn:disabled,
+.icon-button:disabled { opacity: 0.55; cursor: not-allowed; }
+.icon-button { width: 36px; padding: 0; }
+.icon-button.danger:hover { color: #fb7185; border-color: #fb7185; }
+.policy-error { margin-bottom: 18px; padding: 12px 14px; border: 1px solid rgba(244, 63, 94, 0.4); border-radius: var(--radius-sm); color: #fda4af; background: rgba(244, 63, 94, 0.12); }
+.policy-form-panel,
+.simulator-panel,
+.decision-placeholder,
+.decision-panel { border: 1px solid var(--border-medium); border-radius: var(--radius-md); background: var(--bg-card); box-shadow: var(--shadow-card); }
+.policy-form-panel { margin-bottom: 20px; padding: 20px; }
+.policy-form-heading,
+.simulator-panel-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.policy-form-heading h2,
+.simulator-panel-heading h2 { font-size: 1rem; }
+.policy-form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+.form-input { width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); font: inherit; }
+.form-input:focus { outline: 2px solid var(--accent-cyan); outline-offset: 1px; }
+.policy-checkbox { display: flex; align-items: center; gap: 8px; align-self: end; min-height: 40px; color: var(--text-secondary); font-size: 0.8125rem; }
+.table-scroll { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th, .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); font-size: 0.8125rem; white-space: nowrap; }
+.data-table th { color: var(--text-muted); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.table-subtext { display: block; margin-top: 3px; color: var(--text-muted); font-size: 0.6875rem; }
+.table-actions { display: flex; gap: 6px; }
+.status-badge { display: inline-flex; padding: 4px 8px; border-radius: 99px; font-size: 0.6875rem; font-weight: 700; }
+.status-badge.active { color: #6ee7b7; background: rgba(16, 185, 129, 0.16); }
+.status-badge.inactive { color: #fda4af; background: rgba(244, 63, 94, 0.16); }
+.simulator-layout { display: grid; grid-template-columns: minmax(280px, 0.8fr) minmax(320px, 1.2fr); gap: 20px; align-items: stretch; }
+.simulator-panel, .decision-placeholder, .decision-panel { padding: 24px; }
+.simulator-panel { display: flex; flex-direction: column; gap: 16px; }
+.simulator-submit { margin-top: 4px; }
+.simulator-loading { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); }
+.decision-placeholder, .decision-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 340px; text-align: center; }
+.decision-placeholder { color: var(--text-secondary); }
+.decision-placeholder svg { margin-bottom: 12px; color: var(--accent-cyan); }
+.decision-placeholder h2, .decision-panel h2 { margin: 10px 0 6px; font-size: 1.35rem; }
+.decision-panel p { max-width: 460px; color: var(--text-secondary); }
+.decision-icon { display: flex; align-items: center; justify-content: center; width: 58px; height: 58px; border-radius: 50%; }
+.decision-label { margin-top: 14px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; }
+.decision-allow { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.1); }
+.decision-allow .decision-icon { color: #34d399; background: rgba(16, 185, 129, 0.18); }
+.decision-allow .decision-label { color: #34d399; }
+.decision-deny { border-color: rgba(244, 63, 94, 0.5); background: rgba(244, 63, 94, 0.1); }
+.decision-deny .decision-icon { color: #fb7185; background: rgba(244, 63, 94, 0.18); }
+.decision-deny .decision-label { color: #fb7185; }
+.decision-approval_required { border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.1); }
+.decision-approval_required .decision-icon { color: #fbbf24; background: rgba(245, 158, 11, 0.18); }
+.decision-approval_required .decision-label { color: #fbbf24; }
+.decision-meta { margin-top: 12px; font-size: 0.75rem; }
+
 /* ==========================================================================
    Responsive Adjustments
    ========================================================================== */
@@ -1393,4 +1467,9 @@ body {
   .role-filter-select {
     width: 100%;
   }
+
+  .policy-form-grid,
+  .simulator-layout { grid-template-columns: 1fr; }
+
+  .page-header-actions { flex-wrap: wrap; }
 }
