@@ -13,11 +13,22 @@ vi.mock('../api/policies', () => ({
 }));
 
 const policy = {
-  id: 'p-1', role: 'ADMIN', resourceType: 'DATABASE', environment: 'PRODUCTION',
-  criticality: 'HIGH', maxAccessLevel: 4, requiresApprovalForElevated: true, isActive: true,
+  id: 'p-1',
+  role: 'ADMIN',
+  resourceType: 'DATABASE',
+  environment: 'PRODUCTION',
+  criticality: 'HIGH',
+  maxAccessLevel: 4,
+  requiresApprovalForElevated: true,
+  isActive: true,
 };
 
-const renderPage = () => render(<MemoryRouter><Policies /></MemoryRouter>);
+const renderPage = () =>
+  render(
+    <MemoryRouter>
+      <Policies />
+    </MemoryRouter>,
+  );
 
 describe('Policy management screen', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -37,8 +48,12 @@ describe('Policy management screen', () => {
   });
 
   it('renders a friendly error when policies fail to load', async () => {
-    vi.mocked(policiesApi.getPoliciesApi).mockRejectedValueOnce(new Error('Policy service unavailable'));
+    vi.mocked(policiesApi.getPoliciesApi).mockRejectedValueOnce(
+      new Error('Policy service unavailable'),
+    );
     renderPage();
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Policy service unavailable'));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('Policy service unavailable'),
+    );
   });
 });

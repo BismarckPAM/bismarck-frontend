@@ -276,7 +276,9 @@ export const Users: React.FC = () => {
                       <span className="user-email-text">{user.email}</span>
                     </td>
                     <td>
-                      <span className={getRoleBadgeClass(user.role)}>{user.role || 'Unassigned'}</span>
+                      <span className={getRoleBadgeClass(user.role)}>
+                        {user.role || 'Unassigned'}
+                      </span>
                     </td>
                     <td>
                       <span className="user-department-text">{user.department}</span>

@@ -8,31 +8,31 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': {
-        target: env.VITE_API_URL,
-        changeOrigin: true,
-        secure: true,
-      },
-      '/authz': {
-        target: env.VITE_API_URL,
-        changeOrigin: true,
-        secure: true,
+    plugins: [react()],
+    server: {
+      proxy: {
+        '/api': {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+          secure: true,
+        },
+        '/authz': {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+          secure: true,
+        },
       },
     },
-  },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    css: true,
-  },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.ts',
+      css: true,
+    },
   };
 });
