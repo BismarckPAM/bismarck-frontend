@@ -81,7 +81,8 @@ jobs:
 
       - name: Build Frontend
         env:
-          VITE_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+          VITE_API_URL: https://ubiquitous-trout-9xv7wpgv7q92x99g-8080.app.github.dev
+          VITE_AUTHORIZATION_API_URL: https://ubiquitous-trout-9xv7wpgv7q92x99g-8080.app.github.dev
         run: npm run build
 
   # ============================================================
@@ -146,7 +147,8 @@ jobs:
           # into the Vite production bundle inside the Docker build (the
           # Dockerfile declares ARG VITE_API_URL for this purpose).
           build-args: |
-            VITE_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+            VITE_API_URL=https://ubiquitous-trout-9xv7wpgv7q92x99g-8080.app.github.dev
+            VITE_AUTHORIZATION_API_URL=https://ubiquitous-trout-9xv7wpgv7q92x99g-8080.app.github.dev
 
           tags: |
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend-ui:${{ github.sha }}
