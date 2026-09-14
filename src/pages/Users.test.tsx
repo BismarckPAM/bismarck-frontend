@@ -101,6 +101,21 @@ describe('User Directory Screen (Users Component)', () => {
     expect(screen.getByText('Compliance')).toBeInTheDocument();
   });
 
+  it('renders users with an unassigned role without crashing', async () => {
+    vi.mocked(usersApi.getUsersApi).mockResolvedValueOnce([
+      { ...mockUsersList[0], role: undefined as unknown as string },
+    ]);
+
+    renderUsersPage();
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('loading-state')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Alice Vance')).toBeInTheDocument();
+    expect(screen.getByText('Unassigned')).toBeInTheDocument();
+  });
+
   it('renders the empty state when the API returns an empty array', async () => {
     vi.mocked(usersApi.getUsersApi).mockResolvedValueOnce([]);
 

@@ -42,13 +42,14 @@ export const Users: React.FC = () => {
 
   // Client-side filter
   const filteredUsers = users.filter((user) => {
+    const role = typeof user.role === 'string' ? user.role : '';
     const matchesSearch =
       (user.fullName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.email ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.department ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.role ?? '').toLowerCase().includes(searchQuery.toLowerCase());
+      role.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesRole = selectedRole === 'ALL' || user.role === selectedRole;
+    const matchesRole = selectedRole === 'ALL' || role === selectedRole;
 
     return matchesSearch && matchesRole;
   });
@@ -56,8 +57,8 @@ export const Users: React.FC = () => {
   const adminCount = users.filter((u) => u.role?.toLowerCase().includes('admin')).length;
   const uniqueDepartments = new Set(users.map((u) => u.department).filter(Boolean)).size;
 
-  const getRoleBadgeClass = (role: string) => {
-    const lower = role.toLowerCase();
+  const getRoleBadgeClass = (role?: string) => {
+    const lower = role?.toLowerCase() ?? '';
     if (lower.includes('admin')) return 'role-badge admin';
     if (lower.includes('operator')) return 'role-badge operator';
     if (lower.includes('auditor')) return 'role-badge auditor';
@@ -275,7 +276,7 @@ export const Users: React.FC = () => {
                       <span className="user-email-text">{user.email}</span>
                     </td>
                     <td>
-                      <span className={getRoleBadgeClass(user.role)}>{user.role}</span>
+                      <span className={getRoleBadgeClass(user.role)}>{user.role || 'Unassigned'}</span>
                     </td>
                     <td>
                       <span className="user-department-text">{user.department}</span>
