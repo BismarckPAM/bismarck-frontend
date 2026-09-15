@@ -1,0 +1,28 @@
+BISMARCK SPRINT 2 JMETER PLAN
+
+Purpose:
+Measure end-to-end performance of POST /api/authorization/check through the deployed API Gateway.
+
+Flow:
+1. setUp Thread Group
+2. POST /api/identity/auth/login
+3. Extract $.token
+4. Store JWT as a JMeter property
+5. Main load Thread Group
+6. POST /api/authorization/check
+7. Assert HTTP 200
+8. Assert decision is ALLOW / DENY / APPROVAL_REQUIRED
+9. Assert response time <= 300 ms
+10. Save JTL and generate HTML dashboard
+
+Default load resource:
+Development / LOW / VirtualMachine
+Resource ID: 56ecea3c-4812-41cb-bfbd-140bdd78691a
+
+Default user:
+Admin
+User ID: b288ed05-3e5e-41af-b1ca-09901173ecdf
+
+Secrets:
+No password and no JWT are stored in this pack.
+Credentials are loaded into the local PowerShell process by setup_env.ps1.
