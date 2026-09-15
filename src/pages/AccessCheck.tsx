@@ -136,7 +136,7 @@ export default function AccessCheck() {
                   <option value="">Select a resource</option>
                   {resources.map((resource) => (
                     <option key={resource.id} value={resource.id}>
-                      {resource.name} · {resource.environment}
+                      {resource.type} · {resource.environment}
                     </option>
                   ))}
                 </select>
