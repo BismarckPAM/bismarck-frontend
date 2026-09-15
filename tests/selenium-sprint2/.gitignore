@@ -1,0 +1,7 @@
+.env.selenium
+.venv/
+__pycache__/
+.pytest_cache/
+artifacts/*.html
+artifacts/screenshots/*.png
+*.pyc
