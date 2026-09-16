@@ -85,9 +85,7 @@ export const Login: React.FC = () => {
           {/* Login Form */}
           <form className="login-form" onSubmit={handleSubmit} noValidate>
             <div className="form-group">
-              <label htmlFor="email" className="form-label">
                 Corporate Email Address
-              </label>
               <div className="input-field-wrapper">
                 <Mail className="input-icon" size={18} aria-hidden="true" />
                 <input
@@ -109,9 +107,7 @@ export const Login: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password" className="form-label">
                 Master Security Password
-              </label>
               <div className="input-field-wrapper">
                 <Lock className="input-icon" size={18} aria-hidden="true" />
                 <input
