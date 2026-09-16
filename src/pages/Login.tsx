@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  ShieldCheck,
-  Lock,
-  Mail,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  ArrowRight,
-  KeyRound,
-} from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, AlertCircle, ArrowRight, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Login: React.FC = () => {
