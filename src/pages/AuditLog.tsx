@@ -25,7 +25,8 @@ export const AuditLog: React.FC = () => {
     try {
       const result = await getAuditLogs({ ...query, page, pageSize: PAGE_SIZE });
       setEntries(result.items);
-      setTotalPages(result.totalPages ?? Math.ceil(result.totalCount / PAGE_SIZE) || 1);
+      const computed = Math.ceil(result.totalCount / PAGE_SIZE) || 1;
+      setTotalPages(result.totalPages ?? computed);
     } catch (err) {
       setError(isApiError(err) ? err.message : 'Unable to load audit logs.');
     } finally {
