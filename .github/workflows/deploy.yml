@@ -82,6 +82,7 @@ jobs:
       - name: Build Frontend
         env:
           VITE_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+          VITE_AUTHORIZATION_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
         run: npm run build
 
   # ============================================================
@@ -147,6 +148,7 @@ jobs:
           # Dockerfile declares ARG VITE_API_URL for this purpose).
           build-args: |
             VITE_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+            VITE_AUTHORIZATION_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
 
           tags: |
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend-ui:${{ github.sha }}

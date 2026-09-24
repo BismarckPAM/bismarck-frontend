@@ -3,4 +3,5 @@ dist
 .vscode
 .idea
 coverage
+.kilo
 *.log

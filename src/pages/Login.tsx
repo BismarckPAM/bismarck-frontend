@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  ShieldCheck,
-  Lock,
-  Mail,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  ArrowRight,
-  KeyRound,
-} from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, AlertCircle, ArrowRight, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Login: React.FC = () => {
@@ -89,7 +80,7 @@ export const Login: React.FC = () => {
                 Corporate Email Address
               </label>
               <div className="input-field-wrapper">
-                <Mail className="input-icon" size={18} aria-hidden="true" />
+                {/*   <Mail className="input-icon" size={18} aria-hidden="true" /> */}
                 <input
                   id="email"
                   name="email"
@@ -113,7 +104,7 @@ export const Login: React.FC = () => {
                 Master Security Password
               </label>
               <div className="input-field-wrapper">
-                <Lock className="input-icon" size={18} aria-hidden="true" />
+                {/* <Lock className="input-icon" size={18} aria-hidden="true" /> */}
                 <input
                   id="password"
                   name="password"

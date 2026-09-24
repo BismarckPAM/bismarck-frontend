@@ -10,6 +10,8 @@ COPY . .
 # Injects the Gateway URL into the Vite production build
 ARG VITE_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
 ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_AUTHORIZATION_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+ENV VITE_AUTHORIZATION_API_URL=$VITE_AUTHORIZATION_API_URL
 
 RUN npm run build
 
