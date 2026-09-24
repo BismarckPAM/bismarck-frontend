@@ -44,6 +44,8 @@ export const ApprovalQueue: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Intentional: kick off the initial/subsequent fetch when `load` changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 

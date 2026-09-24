@@ -35,6 +35,8 @@ export const AuditLog: React.FC = () => {
   }, [query, page]);
 
   useEffect(() => {
+    // Intentional: refetch whenever the query/page dependency changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 

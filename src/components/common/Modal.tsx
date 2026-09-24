@@ -17,11 +17,13 @@ export const Modal: React.FC<{
   const dialogRef = useRef<HTMLDivElement>(null);
   const titleId = 'wf-modal-title';
 
-  // Keep the latest onClose without making it an effect dependency: an inline
-  // onClose changes identity on every parent render, which would otherwise
-  // re-run this effect and steal focus back out of any input inside the dialog.
+  // Keep the latest onClose without making it a dependency of the focus effect:
+  // an inline onClose changes identity on every parent render, which would
+  // otherwise re-run the effect and steal focus back out of any input.
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;

@@ -56,6 +56,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (!isAuthenticated || !userId || !capabilities.notificationsList) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshNotifications();
     const interval = window.setInterval(() => {
       void refreshNotifications();
@@ -67,10 +68,13 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Reset everything when the session changes.
   useEffect(() => {
     if (!isAuthenticated) {
+      // Intentional: clear all session-scoped state when the user logs out.
+      /* eslint-disable react-hooks/set-state-in-effect */
       setMyRequests([]);
       setNotifications([]);
       setViewedIds([]);
       setNotificationsError(null);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [isAuthenticated]);
 

@@ -24,6 +24,7 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     if (!approver || !capabilities.approvalPendingQueue) return;
     let active = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueueLoading(true);
     void (async () => {
       try {
