@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './AppLayout';
 import { AuthProvider } from '../../context/AuthContext';
+import { WorkflowProvider } from '../../state/WorkflowProvider';
 import { TOKEN_KEY, EXPIRES_AT_KEY } from '../../api/client';
 
 const seedAuthSession = () => {
@@ -26,16 +27,18 @@ const renderAppWithLayout = (initialEntries = ['/users']) => {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <AuthProvider>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/users" element={<div data-testid="users-content">Users Content</div>} />
-            <Route
-              path="/resources"
-              element={<div data-testid="resources-content">Resources Content</div>}
-            />
-          </Route>
-          <Route path="/login" element={<div data-testid="login-screen">Login Screen</div>} />
-        </Routes>
+        <WorkflowProvider>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/users" element={<div data-testid="users-content">Users Content</div>} />
+              <Route
+                path="/resources"
+                element={<div data-testid="resources-content">Resources Content</div>}
+              />
+            </Route>
+            <Route path="/login" element={<div data-testid="login-screen">Login Screen</div>} />
+          </Routes>
+        </WorkflowProvider>
       </AuthProvider>
     </MemoryRouter>,
   );
