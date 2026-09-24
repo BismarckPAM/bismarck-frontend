@@ -5,24 +5,24 @@ Management (PAM) system. It drives the access-request / approval / JIT / audit /
 notification workflow implemented by the `bismarck-backend` microservices.
 
 The API contract documented below was derived directly from the backend source
-at commit **`5e8214fcb4b747d01ad0fdbca56cc94a4d950efd`** (*"feat: approval service
-initialization"*). Nothing here is invented: where an endpoint does not exist,
+at commit **`5e8214fcb4b747d01ad0fdbca56cc94a4d950efd`** (_"feat: approval service
+initialization"_). Nothing here is invented: where an endpoint does not exist,
 that is called out explicitly and handled gracefully by the UI.
 
 ---
 
 ## Stack
 
-| Concern | Choice |
-| --- | --- |
-| Framework | React 19 + TypeScript 6 |
-| Build tool | Vite 8 |
-| Routing | react-router-dom 7 |
-| HTTP | axios (shared clients with Bearer-token + 401 interceptors) |
-| Icons | lucide-react |
-| Tests | Vitest 4 + React Testing Library + jsdom |
-| Lint / format | ESLint 10 (flat config) + Prettier 3 |
-| Package manager | **npm** (there is a `package-lock.json`) |
+| Concern         | Choice                                                      |
+| --------------- | ----------------------------------------------------------- |
+| Framework       | React 19 + TypeScript 6                                     |
+| Build tool      | Vite 8                                                      |
+| Routing         | react-router-dom 7                                          |
+| HTTP            | axios (shared clients with Bearer-token + 401 interceptors) |
+| Icons           | lucide-react                                                |
+| Tests           | Vitest 4 + React Testing Library + jsdom                    |
+| Lint / format   | ESLint 10 (flat config) + Prettier 3                        |
+| Package manager | **npm** (there is a `package-lock.json`)                    |
 
 ---
 
@@ -40,12 +40,12 @@ npm run dev               # http://localhost:5173
 All variables are read at build time by Vite and must be prefixed with `VITE_`.
 No secrets belong here.
 
-| Variable | Required | Default | Purpose |
-| --- | --- | --- | --- |
-| `VITE_API_URL` | yes (for live API) | `''` | Base URL of the **API Gateway** — the single public entry point for every browser call. |
-| `VITE_AUTHORIZATION_API_URL` | no | falls back to `VITE_API_URL` | Existing project convention; only used by the authorization client. |
-| `VITE_NOTIFICATION_POLL_MS` | no | `60000` | Notification polling interval in **milliseconds**. Deliberately not aggressive. |
-| `VITE_CAPABILITIES` | no | `{}` | JSON overrides for backend capability flags (see below). |
+| Variable                     | Required           | Default                      | Purpose                                                                                 |
+| ---------------------------- | ------------------ | ---------------------------- | --------------------------------------------------------------------------------------- |
+| `VITE_API_URL`               | yes (for live API) | `''`                         | Base URL of the **API Gateway** — the single public entry point for every browser call. |
+| `VITE_AUTHORIZATION_API_URL` | no                 | falls back to `VITE_API_URL` | Existing project convention; only used by the authorization client.                     |
+| `VITE_NOTIFICATION_POLL_MS`  | no                 | `60000`                      | Notification polling interval in **milliseconds**. Deliberately not aggressive.         |
+| `VITE_CAPABILITIES`          | no                 | `{}`                         | JSON overrides for backend capability flags (see below).                                |
 
 Example `.env`:
 
@@ -59,17 +59,17 @@ All `/api` and `/authz` calls are proxied through the gateway (`vite.config.ts`
 
 ### Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the dev server (Vite). |
-| `npm run build` | Type-check (`tsc -b`) then create a production build. |
-| `npm run preview` | Serve the production build locally. |
-| `npm run lint` | Run ESLint over the whole project. |
-| `npm run format` | Auto-format with Prettier. |
-| `npm run format:check` | Verify formatting (used in CI). |
-| `npm run test` | Run Vitest in watch mode. |
-| `npm run test:run` | Run the test suite once. |
-| `npm run test:coverage` | Run tests with V8 coverage. |
+| Command                 | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `npm run dev`           | Start the dev server (Vite).                          |
+| `npm run build`         | Type-check (`tsc -b`) then create a production build. |
+| `npm run preview`       | Serve the production build locally.                   |
+| `npm run lint`          | Run ESLint over the whole project.                    |
+| `npm run format`        | Auto-format with Prettier.                            |
+| `npm run format:check`  | Verify formatting (used in CI).                       |
+| `npm run test`          | Run Vitest in watch mode.                             |
+| `npm run test:run`      | Run the test suite once.                              |
+| `npm run test:coverage` | Run tests with V8 coverage.                           |
 
 ### Quality gate
 
@@ -82,8 +82,8 @@ npm run test:coverage
 npm run build
 ```
 
-Latest results: **lint 0 problems**, **format clean**, **126 tests passing across
-26 files**, **coverage 82.8% statements / 84.6% lines / 75.8% branches**,
+Latest results: **lint 0 problems**, **format clean**, **82 tests passing across
+17 files**, **coverage 80.3% statements / 82.3% lines / 71.5% branches**,
 **production build succeeds**.
 
 ---
@@ -94,34 +94,34 @@ Base URL = API Gateway. Every request is authenticated with a **JWT Bearer
 token** in the `Authorization` header. The gateway forwards to the owning
 service.
 
-| Feature | Method | Endpoint | Request body | Response | Required role |
-| --- | --- | --- | --- | --- | --- |
-| Submit access request | `POST` | `/api/approval/requests` | `CreateApprovalRequestRequest` | `ApprovalRequestResponse` (201) | Any authenticated user |
-| List pending requests (approval queue) | `GET` | `/api/approval/requests` | — | `ApprovalRequestResponse[]` | Approver (`Admin`) — others get `403` |
-| View a single request | `GET` | `/api/approval/requests/{id}` | — | `ApprovalRequestResponse` | Any authenticated user |
-| Approve request | `POST` | `/api/approval/requests/{id}/approve` | — | `ApprovalRequestResponse` | Approver (`Admin`) — others get `403` |
-| Reject request | `POST` | `/api/approval/requests/{id}/reject` | `RejectApprovalRequest` | `ApprovalRequestResponse` | Approver (`Admin`) — others get `403` |
-| List notifications | `GET` | `/api/notifications/{userId}?page=&pageSize=` | — | `PagedResult<NotificationResponseDto>` | Any authenticated user |
-| Query audit logs | `GET` | `/api/audit/logs?user=&resource=&eventType=&from=&to=&page=&pageSize=` | — | `PagedResult<AuditLog>` | `[Authorize]` (policies vary by service) |
-| Manually revoke a JIT permission | `POST` | `/api/authorization/permissions/{id}/revoke` | — | `{ message, id, status, revokedAt }` | `Admin` — others get `403` |
-| List resources | `GET` | `/api/resources` | — | `ResourceResponse[]` | Any authenticated user |
-| Log in | `POST` | `/api/identity/auth/login` | `LoginRequest` | `LoginResponse` | Public |
+| Feature                                | Method | Endpoint                                                               | Request body                   | Response                               | Required role                            |
+| -------------------------------------- | ------ | ---------------------------------------------------------------------- | ------------------------------ | -------------------------------------- | ---------------------------------------- |
+| Submit access request                  | `POST` | `/api/approval/requests`                                               | `CreateApprovalRequestRequest` | `ApprovalRequestResponse` (201)        | Any authenticated user                   |
+| List pending requests (approval queue) | `GET`  | `/api/approval/requests`                                               | —                              | `ApprovalRequestResponse[]`            | Approver (`Admin`) — others get `403`    |
+| View a single request                  | `GET`  | `/api/approval/requests/{id}`                                          | —                              | `ApprovalRequestResponse`              | Any authenticated user                   |
+| Approve request                        | `POST` | `/api/approval/requests/{id}/approve`                                  | —                              | `ApprovalRequestResponse`              | Approver (`Admin`) — others get `403`    |
+| Reject request                         | `POST` | `/api/approval/requests/{id}/reject`                                   | `RejectApprovalRequest`        | `ApprovalRequestResponse`              | Approver (`Admin`) — others get `403`    |
+| List notifications                     | `GET`  | `/api/notifications/{userId}?page=&pageSize=`                          | —                              | `PagedResult<NotificationResponseDto>` | Any authenticated user                   |
+| Query audit logs                       | `GET`  | `/api/audit/logs?user=&resource=&eventType=&from=&to=&page=&pageSize=` | —                              | `PagedResult<AuditLog>`                | `[Authorize]` (policies vary by service) |
+| Manually revoke a JIT permission       | `POST` | `/api/authorization/permissions/{id}/revoke`                           | —                              | `{ message, id, status, revokedAt }`   | `Admin` — others get `403`               |
+| List resources                         | `GET`  | `/api/resources`                                                       | —                              | `ResourceResponse[]`                   | Any authenticated user                   |
+| Log in                                 | `POST` | `/api/identity/auth/login`                                             | `LoginRequest`                 | `LoginResponse`                        | Public                                   |
 
 ### Request / response shapes (exact backend fields)
 
 **`CreateApprovalRequestRequest`** (`POST /api/approval/requests`)
 
-| Field | Type | Validation (backend) |
-| --- | --- | --- |
-| `resourceId` | `string` | **Required**, max length 100 |
-| `requestedLevel` | `int` | Range **1–5** |
-| `reason` | `string` | **Required**, max length 500 |
-| `durationMinutes` | `int` | Range **1–1440** |
+| Field             | Type     | Validation (backend)         |
+| ----------------- | -------- | ---------------------------- |
+| `resourceId`      | `string` | **Required**, max length 100 |
+| `requestedLevel`  | `int`    | Range **1–5**                |
+| `reason`          | `string` | **Required**, max length 500 |
+| `durationMinutes` | `int`    | Range **1–1440**             |
 
 **`RejectApprovalRequest`** (`POST /api/approval/requests/{id}/reject`)
 
-| Field | Type | Validation (backend) |
-| --- | --- | --- |
+| Field    | Type     | Validation (backend)         |
+| -------- | -------- | ---------------------------- |
 | `reason` | `string` | **Required**, max length 500 |
 
 **`ApprovalRequestResponse`**
@@ -140,7 +140,7 @@ reviewedByUserId: string | null, rejectionReason: string | null
 - The frontend normaliser `normalizeApprovalStatus` tolerates both the string
   enum name and a numeric ordinal, because not every service registers
   `JsonStringEnumConverter`.
-- **Roles** — the Identity token carries a *single* role (`ClaimTypes.Role`).
+- **Roles** — the Identity token carries a _single_ role (`ClaimTypes.Role`).
   Approver authorization is configured as `Approval:ApproverRoles = ["Admin"]`,
   so **Admin** is the only role the backend currently treats as an approver.
   `Manager` is handled defensively in the UI (`src/auth/roles.ts`) so it works if
@@ -179,27 +179,29 @@ reviewedByUserId: string | null, rejectionReason: string | null
 
 ## Screens & features
 
-| Route | Screen | Who sees it |
-| --- | --- | --- |
-| `/` | Dashboard | All authenticated users |
-| `/request-access` | Request Access form | All authenticated users |
-| `/my-requests` | My Requests | All authenticated users |
-| `/approval-queue` | Approval Queue | Approvers (Admin) |
-| `/jit` | JIT Access | All authenticated users (revoke is Admin-only) |
-| `/audit` | Audit Log | Admin (and Manager defensively) |
-| `/notifications` | Notifications | All authenticated users |
+| Route             | Screen              | Who sees it                                    |
+| ----------------- | ------------------- | ---------------------------------------------- |
+| `/`               | Dashboard           | All authenticated users                        |
+| `/request-access` | Request Access form | All authenticated users                        |
+| `/my-requests`    | My Requests         | All authenticated users                        |
+| `/approval-queue` | Approval Queue      | Approvers (Admin)                              |
+| `/jit`            | JIT Access          | All authenticated users (revoke is Admin-only) |
+| `/audit`          | Audit Log           | Admin (and Manager defensively)                |
+| `/notifications`  | Notifications       | All authenticated users                        |
 
 Navigation items are filtered by role; route guards enforce access on direct URL
 entry. Every screen implements loading, empty, error, retry, disabled, and
 success states, and mutations update state in place without a full page reload.
 
 ### Dashboard
+
 Summarises the current user's activity: totals, pending/approved/rejected
 counters, unread notifications, recent notifications, and — for approvers — the
 pending queue and a link to the audit log. Optional panels degrade gracefully if
 their endpoint is unavailable.
 
 ### Request Access
+
 Submits to `POST /api/approval/requests` using the exact field names above.
 Client-side validation mirrors the backend: resource required, access level
 required (1–5), justification required with a minimum length, duration required
@@ -209,11 +211,13 @@ form, inserts the request into My Requests, and refreshes notifications — no
 reload.
 
 ### My Requests
+
 Lists requests submitted in the current session (see limitations) with search,
 status/resource filtering, newest/oldest/status sorting, detail drawer, and the
 full status timeline. Status is conveyed by accessible text, not colour alone.
 
 ### Approval Queue
+
 Approver-only. Lists pending requests with requester/resource/level/duration/
 timestamp. Approve (with confirmation dialog) and Reject (modal requiring a
 reason, validated non-blank) call the exact backend endpoints, disable while
@@ -221,6 +225,7 @@ submitting, prevent duplicate submissions, update the queue in place on success,
 preserve dialog input on failure, and refresh notifications.
 
 ### Notifications
+
 Bell in the shell with unread count, plus a full page. Fetches
 `GET /api/notifications/{userId}`, shows title/message/time/read-state/type,
 links to the related request when a request id exists, offers manual refresh,
@@ -228,6 +233,7 @@ and polls on a configurable interval with a single well-cleaned-up timer (no
 duplicate intervals or leaks). Empty/loading/error states are handled.
 
 ### JIT Access
+
 JIT grants are created automatically by the `approval-granted` Kafka event —
 there is **no standalone JIT request endpoint**. The only JIT mutation the
 backend exposes is the Admin-only manual revoke
@@ -235,6 +241,7 @@ backend exposes is the Admin-only manual revoke
 Normal access requests and JIT grants are clearly distinguished.
 
 ### Audit Log
+
 Queryable audit feed (`GET /api/audit/logs`) with search, filtering by actor,
 action/event type, resource and date, pagination, and an event detail view.
 Sensitive metadata is only shown to the extent the backend authorises it.
@@ -272,17 +279,17 @@ src/
 backend today. Defaults reflect reality; flip them (or set `VITE_CAPABILITIES`)
 once an endpoint is added, with no screen changes required.
 
-| Flag | Default | Reason |
-| --- | --- | --- |
-| `approvalPendingQueue` | `true` | `GET /api/approval/requests` exists (approver-only). |
-| `approvalGetById` | `true` | `GET /api/approval/requests/{id}` exists. |
-| `approvalMyRequests` | `false` | **No "list my own requests" endpoint.** The `GET` above returns the approver-only pending queue, so My Requests shows session-submitted requests. |
-| `notificationsList` | `true` | `GET /api/notifications/{userId}` exists. |
-| `notificationsMarkRead` | `false` | **No mark-as-read endpoint.** Read state is local-only and clearly not persisted. |
-| `auditList` | `true` | `GET /api/audit/logs` exists. |
-| `jitList` | `false` | **No "list JIT permissions" endpoint.** |
-| `jitRequest` | `false` | **No standalone JIT request endpoint** (grants come from the `approval-granted` event). |
-| `jitRevoke` | `true` | `POST /api/authorization/permissions/{id}/revoke` exists (Admin-only). |
+| Flag                    | Default | Reason                                                                                                                                            |
+| ----------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `approvalPendingQueue`  | `true`  | `GET /api/approval/requests` exists (approver-only).                                                                                              |
+| `approvalGetById`       | `true`  | `GET /api/approval/requests/{id}` exists.                                                                                                         |
+| `approvalMyRequests`    | `false` | **No "list my own requests" endpoint.** The `GET` above returns the approver-only pending queue, so My Requests shows session-submitted requests. |
+| `notificationsList`     | `true`  | `GET /api/notifications/{userId}` exists.                                                                                                         |
+| `notificationsMarkRead` | `false` | **No mark-as-read endpoint.** Read state is local-only and clearly not persisted.                                                                 |
+| `auditList`             | `true`  | `GET /api/audit/logs` exists.                                                                                                                     |
+| `jitList`               | `false` | **No "list JIT permissions" endpoint.**                                                                                                           |
+| `jitRequest`            | `false` | **No standalone JIT request endpoint** (grants come from the `approval-granted` event).                                                           |
+| `jitRevoke`             | `true`  | `POST /api/authorization/permissions/{id}/revoke` exists (Admin-only).                                                                            |
 
 ### Backend limitations / future work
 
@@ -305,6 +312,7 @@ once an endpoint is added, with no screen changes required.
 Run the backend (gateway + services) and `npm run dev`, then log in.
 
 **Normal user**
+
 1. Log in with a non-admin account → only Dashboard / Request Access / My
    Requests / JIT / Notifications appear.
 2. Manually visit `/approval-queue` → access is denied (guard + backend `403`).
@@ -314,11 +322,13 @@ Run the backend (gateway + services) and `npm run dev`, then log in.
    Requests without a reload.
 
 **Manager**
+
 1. Log in → same screens as a normal user (backend treats only `Admin` as
    approver).
 2. `/approval-queue` reflects the backend decision (`403` → denied).
 
 **Admin**
+
 1. Log in → Approval Queue and Audit Log become visible.
 2. Approve a pending request (confirmation dialog) → row leaves the queue;
    notifications refresh.
