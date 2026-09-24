@@ -7,9 +7,11 @@ import { AuthProvider } from '../context/AuthContext';
 import { WorkflowProvider } from '../state/WorkflowProvider';
 
 vi.mock('../api/resources', () => ({
-  getResourcesApi: vi.fn().mockResolvedValue([
-    { id: 'res-1', name: 'Prod DB', type: 'DATABASE', environment: 'PRODUCTION' },
-  ]),
+  getResourcesApi: vi
+    .fn()
+    .mockResolvedValue([
+      { id: 'res-1', name: 'Prod DB', type: 'DATABASE', environment: 'PRODUCTION' },
+    ]),
 }));
 
 const createApprovalRequest = vi.fn();

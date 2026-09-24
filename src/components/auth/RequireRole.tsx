@@ -20,8 +20,8 @@ export const RequireRole: React.FC<{
           <ShieldAlert size={32} aria-hidden="true" />
           <h2 className="wf-state-title">Access restricted</h2>
           <p className="wf-state-text">
-            You do not have permission to view this screen. If you believe this is an error,
-            contact an administrator.
+            You do not have permission to view this screen. If you believe this is an error, contact
+            an administrator.
           </p>
           <Link to="/dashboard" className="link-btn">
             Back to Dashboard

@@ -107,7 +107,8 @@ export const ApprovalQueue: React.FC = () => {
           <h1 className="page-title">Approval Queue</h1>
           <p className="page-description">
             Pending access requests awaiting a decision. Endpoints:
-            <code> GET /api/approval/requests</code>, <code>POST /api/approval/requests/{'{id}'}/approve</code>,{' '}
+            <code> GET /api/approval/requests</code>,{' '}
+            <code>POST /api/approval/requests/{'{id}'}/approve</code>,{' '}
             <code>POST /api/approval/requests/{'{id}'}/reject</code>.
           </p>
         </div>

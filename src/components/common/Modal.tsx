@@ -17,19 +17,25 @@ export const Modal: React.FC<{
   const dialogRef = useRef<HTMLDivElement>(null);
   const titleId = 'wf-modal-title';
 
+  // Keep the latest onClose without making it an effect dependency: an inline
+  // onClose changes identity on every parent render, which would otherwise
+  // re-run this effect and steal focus back out of any input inside the dialog.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') onCloseRef.current();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       previouslyFocused?.focus?.();
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div className="wf-modal-backdrop" onMouseDown={onClose}>

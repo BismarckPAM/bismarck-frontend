@@ -179,8 +179,8 @@ export const JitAccess: React.FC = () => {
             />
           </label>
           <p className="wf-hint">
-            <RefreshCw size={14} aria-hidden="true" /> A 409 means the permission is already
-            expired or revoked; a 404 means it was not found.
+            <RefreshCw size={14} aria-hidden="true" /> A 409 means the permission is already expired
+            or revoked; a 404 means it was not found.
           </p>
         </Modal>
       )}

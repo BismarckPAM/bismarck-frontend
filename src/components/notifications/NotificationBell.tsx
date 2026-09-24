@@ -89,7 +89,11 @@ export const NotificationBell: React.FC = () => {
           {notificationsError && (
             <div className="wf-bell-message wf-bell-error" role="alert">
               <span>{notificationsError}</span>
-              <button type="button" className="link-btn" onClick={() => void refreshNotifications()}>
+              <button
+                type="button"
+                className="link-btn"
+                onClick={() => void refreshNotifications()}
+              >
                 Retry
               </button>
             </div>

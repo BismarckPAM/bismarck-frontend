@@ -36,9 +36,7 @@ async function withNormalizedError<T>(fn: () => Promise<T>): Promise<T> {
  * Submit an access request.
  * POST /api/approval/requests  -> 201 ApprovalRequestResponse
  */
-export async function createApprovalRequest(
-  body: CreateApprovalRequest,
-): Promise<ApprovalRequest> {
+export async function createApprovalRequest(body: CreateApprovalRequest): Promise<ApprovalRequest> {
   return withNormalizedError(async () => {
     const { data } = await identityClient.post<Record<string, unknown>>(
       '/api/approval/requests',
@@ -55,9 +53,7 @@ export async function createApprovalRequest(
  */
 export async function listPendingApprovalRequests(): Promise<ApprovalRequest[]> {
   return withNormalizedError(async () => {
-    const { data } = await identityClient.get<Record<string, unknown>[]>(
-      '/api/approval/requests',
-    );
+    const { data } = await identityClient.get<Record<string, unknown>[]>('/api/approval/requests');
     return Array.isArray(data) ? data.map(toApprovalRequest) : [];
   });
 }

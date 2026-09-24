@@ -107,6 +107,7 @@ describe('JIT Access', () => {
     await user.click(await screen.findByRole('button', { name: /revoke/i }));
     await user.click(screen.getByRole('button', { name: /confirm revoke/i }));
 
-    expect(await screen.findByText(/Already expired/i)).toBeInTheDocument();
+    const errors = await screen.findAllByText(/Already expired/i);
+    expect(errors.length).toBeGreaterThan(0);
   });
 });

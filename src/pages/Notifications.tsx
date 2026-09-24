@@ -1,7 +1,12 @@
 import React from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useWorkflow } from '../state/WorkflowContext';
-import { LoadingState, ErrorState, EmptyState, UnsupportedNotice } from '../components/common/StateViews';
+import {
+  LoadingState,
+  ErrorState,
+  EmptyState,
+  UnsupportedNotice,
+} from '../components/common/StateViews';
 import { formatDateTime, timeAgo } from '../utils/format';
 
 export const Notifications: React.FC = () => {

@@ -30,9 +30,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (error) {
       // Keep the previous feed; surface a clear message instead of crashing.
       if (seq === requestSeq.current) {
-        setNotificationsError(
-          isApiError(error) ? error.message : 'Unable to load notifications.',
-        );
+        setNotificationsError(isApiError(error) ? error.message : 'Unable to load notifications.');
       }
     } finally {
       if (seq === requestSeq.current) setNotificationsLoading(false);

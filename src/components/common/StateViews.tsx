@@ -2,9 +2,7 @@ import React from 'react';
 import { AlertTriangle, Inbox, RotateCw } from 'lucide-react';
 
 /** Consistent loading state — never a blank page while data loads. */
-export const LoadingState: React.FC<{ message?: string }> = ({
-  message = 'Loading…',
-}) => (
+export const LoadingState: React.FC<{ message?: string }> = ({ message = 'Loading…' }) => (
   <div className="wf-state" data-testid="loading-state" role="status" aria-live="polite">
     <div className="spinner" aria-hidden="true" />
     <p className="wf-state-text">{message}</p>

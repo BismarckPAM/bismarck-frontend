@@ -67,27 +67,37 @@ export const Dashboard: React.FC = () => {
       <div className="metrics-grid">
         <article className="metric-card">
           <Send size={20} aria-hidden="true" />
-          <span className="metric-value" data-testid="metric-total">{counts.total}</span>
+          <span className="metric-value" data-testid="metric-total">
+            {counts.total}
+          </span>
           <span className="metric-label">Total requests</span>
         </article>
         <article className="metric-card">
           <Clock size={20} aria-hidden="true" />
-          <span className="metric-value" data-testid="metric-pending">{counts.pending}</span>
+          <span className="metric-value" data-testid="metric-pending">
+            {counts.pending}
+          </span>
           <span className="metric-label">Pending</span>
         </article>
         <article className="metric-card">
           <CheckCircle2 size={20} aria-hidden="true" />
-          <span className="metric-value" data-testid="metric-approved">{counts.approved}</span>
+          <span className="metric-value" data-testid="metric-approved">
+            {counts.approved}
+          </span>
           <span className="metric-label">Approved</span>
         </article>
         <article className="metric-card">
           <XCircle size={20} aria-hidden="true" />
-          <span className="metric-value" data-testid="metric-rejected">{counts.rejected}</span>
+          <span className="metric-value" data-testid="metric-rejected">
+            {counts.rejected}
+          </span>
           <span className="metric-label">Rejected</span>
         </article>
         <article className="metric-card">
           <Bell size={20} aria-hidden="true" />
-          <span className="metric-value" data-testid="metric-unread">{unreadCount}</span>
+          <span className="metric-value" data-testid="metric-unread">
+            {unreadCount}
+          </span>
           <span className="metric-label">Unread notifications</span>
         </article>
       </div>

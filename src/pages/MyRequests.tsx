@@ -35,7 +35,8 @@ export const MyRequests: React.FC = () => {
     });
     const sorted = [...filtered];
     if (sort === 'newest') sorted.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-    else if (sort === 'oldest') sorted.sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt));
+    else if (sort === 'oldest')
+      sorted.sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt));
     else sorted.sort((a, b) => a.status.localeCompare(b.status));
     return sorted;
   }, [myRequests, search, statusFilter, sort]);
@@ -98,7 +99,10 @@ export const MyRequests: React.FC = () => {
           </div>
 
           {visible.length === 0 ? (
-            <EmptyState title="No matching requests" message="Try adjusting your search or filters." />
+            <EmptyState
+              title="No matching requests"
+              message="Try adjusting your search or filters."
+            />
           ) : (
             <div className="table-responsive-wrapper">
               <table className="pam-data-table" aria-label="My access requests">

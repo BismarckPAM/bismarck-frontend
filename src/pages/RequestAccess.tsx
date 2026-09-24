@@ -19,7 +19,12 @@ interface FormState {
   durationMinutes: string;
 }
 
-const emptyForm: FormState = { resourceId: '', requestedLevel: '', reason: '', durationMinutes: '' };
+const emptyForm: FormState = {
+  resourceId: '',
+  requestedLevel: '',
+  reason: '',
+  durationMinutes: '',
+};
 
 /** Client-side validation mirroring the Approval Service rules. */
 function validate(form: FormState): Record<string, string> {
@@ -219,7 +224,12 @@ export const RequestAccess: React.FC = () => {
             <Send size={16} aria-hidden="true" />
             <span>{isSubmitting ? 'Submitting…' : 'Submit Request'}</span>
           </button>
-          <button type="button" className="secondary-action-btn" onClick={handleReset} disabled={isSubmitting}>
+          <button
+            type="button"
+            className="secondary-action-btn"
+            onClick={handleReset}
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
         </div>

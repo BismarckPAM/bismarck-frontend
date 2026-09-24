@@ -87,7 +87,9 @@ export const RequestDetails: React.FC<{
             <li key={stage.label} className={stage.done ? 'done' : 'pending'}>
               <span className="wf-timeline-dot" aria-hidden="true" />
               <span className="wf-timeline-label">{stage.label}</span>
-              <span className="wf-timeline-time">{stage.done ? formatDateTime(stage.at) : 'Awaiting decision'}</span>
+              <span className="wf-timeline-time">
+                {stage.done ? formatDateTime(stage.at) : 'Awaiting decision'}
+              </span>
             </li>
           ))}
         </ol>

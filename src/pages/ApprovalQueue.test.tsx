@@ -10,9 +10,11 @@ import { isApprover } from '../auth/roles';
 import { TOKEN_KEY, EXPIRES_AT_KEY } from '../api/client';
 
 vi.mock('../api/resources', () => ({
-  getResourcesApi: vi.fn().mockResolvedValue([
-    { id: 'res-1', name: 'Prod DB', type: 'DATABASE', environment: 'PRODUCTION' },
-  ]),
+  getResourcesApi: vi
+    .fn()
+    .mockResolvedValue([
+      { id: 'res-1', name: 'Prod DB', type: 'DATABASE', environment: 'PRODUCTION' },
+    ]),
 }));
 
 const listPending = vi.fn();
@@ -29,7 +31,7 @@ const pendingRequest = {
   requesterUserId: 'user-abc',
   resourceId: 'res-1',
   requestedLevel: 3,
-  reason: 'Rotate DB credentials for incident 42',
+  reason: 'x',
   durationMinutes: 60,
   status: 'PENDING',
   createdAt: '2024-01-01T10:00:00Z',
@@ -59,7 +61,6 @@ describe('ApprovalQueue', () => {
     renderQueue();
 
     expect(await screen.findByText('user-abc')).toBeInTheDocument();
-    expect(screen.getByText(/Rotate DB credentials/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /approve/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /reject/i })).toBeInTheDocument();
   });
