@@ -11,10 +11,27 @@ vi.mock('../api/authorization', () => ({ checkAuthorizationApi: vi.fn() }));
 vi.mock('../api/users', () => ({ getUsersApi: vi.fn() }));
 vi.mock('../api/resources', () => ({ getResourcesApi: vi.fn() }));
 
-const renderPage = () => render(<MemoryRouter><AccessCheck /></MemoryRouter>);
+const renderPage = () =>
+  render(
+    <MemoryRouter>
+      <AccessCheck />
+    </MemoryRouter>,
+  );
 
-const user = { id: 'u-1', fullName: 'Alice Vance', email: 'alice@example.com', role: 'ADMIN', department: 'Security' };
-const resource = { id: 'r-1', name: 'Production DB', type: 'DATABASE', environment: 'PRODUCTION', criticality: 'HIGH' };
+const user = {
+  id: 'u-1',
+  fullName: 'Alice Vance',
+  email: 'alice@example.com',
+  role: 'ADMIN',
+  department: 'Security',
+};
+const resource = {
+  id: 'r-1',
+  name: 'Production DB',
+  type: 'DATABASE',
+  environment: 'PRODUCTION',
+  criticality: 'HIGH',
+};
 
 describe('Access check simulator', () => {
   beforeEach(() => {
@@ -31,9 +48,13 @@ describe('Access check simulator', () => {
     vi.mocked(authorizationApi.checkAuthorizationApi).mockResolvedValueOnce({ decision, reason });
     const userEvents = userEvent.setup();
     renderPage();
-    await waitFor(() => expect(screen.getByRole('button', { name: /evaluate access/i })).toBeEnabled());
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /evaluate access/i })).toBeEnabled(),
+    );
     await userEvents.click(screen.getByRole('button', { name: /evaluate access/i }));
-    await waitFor(() => expect(screen.getByTestId('decision-result')).toHaveTextContent(decision.replace('_', ' ')));
+    await waitFor(() =>
+      expect(screen.getByTestId('decision-result')).toHaveTextContent(decision.replace('_', ' ')),
+    );
     expect(screen.getByTestId('decision-result')).toHaveTextContent(reason);
   });
 });

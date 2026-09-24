@@ -1,11 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { authorizationClient } from './client';
-import {
-  createPolicyApi,
-  deactivatePolicyApi,
-  getPoliciesApi,
-  updatePolicyApi,
-} from './policies';
+import { createPolicyApi, deactivatePolicyApi, getPoliciesApi, updatePolicyApi } from './policies';
 import { checkAuthorizationApi } from './authorization';
 
 vi.mock('./client', () => ({
@@ -34,7 +29,9 @@ describe('Policy and authorization API modules', () => {
     vi.mocked(authorizationClient.get).mockResolvedValueOnce({ data: [policy] });
     vi.mocked(authorizationClient.post).mockResolvedValueOnce({ data: policy });
     vi.mocked(authorizationClient.put).mockResolvedValueOnce({ data: policy });
-    vi.mocked(authorizationClient.delete).mockResolvedValueOnce({ data: { ...policy, isActive: false } });
+    vi.mocked(authorizationClient.delete).mockResolvedValueOnce({
+      data: { ...policy, isActive: false },
+    });
 
     await expect(getPoliciesApi()).resolves.toEqual([policy]);
     await expect(createPolicyApi(request)).resolves.toEqual(policy);
@@ -48,7 +45,12 @@ describe('Policy and authorization API modules', () => {
   });
 
   it('posts an authorization check and returns the decision', async () => {
-    const check = { userId: 'u-1', resourceId: 'r-1', action: 'READ_STATUS', sessionDurationMinutes: 120 };
+    const check = {
+      userId: 'u-1',
+      resourceId: 'r-1',
+      action: 'READ_STATUS',
+      sessionDurationMinutes: 120,
+    };
     const result = { decision: 'APPROVAL_REQUIRED', reason: 'ELEVATED_ACCESS_REQUIRES_APPROVAL' };
     vi.mocked(authorizationClient.post).mockResolvedValueOnce({ data: result });
 
