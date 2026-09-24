@@ -33,6 +33,9 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
       css: true,
+      // `.kilo` is a git worktree snapshot of this repo; excluding it prevents
+      // duplicate test files from being discovered twice.
+      exclude: ['**/node_modules/**', '**/dist/**', '**/.kilo/**'],
     },
   };
 });
