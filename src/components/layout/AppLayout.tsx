@@ -66,9 +66,7 @@ export const AppLayout: React.FC = () => {
   const navGroups: NavGroupConfig[] = [
     {
       label: 'Overview',
-      items: [
-        { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', aria: 'Dashboard' },
-      ],
+      items: [{ to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', aria: 'Dashboard' }],
     },
     {
       label: 'Access',
