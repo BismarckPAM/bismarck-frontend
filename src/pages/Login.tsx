@@ -99,8 +99,8 @@ export const Login: React.FC = () => {
               accounted for.
             </p>
             <p className="lgx-lede">
-              Vault your credentials, broker approvals and watch just-in-time access rise and
-              expire — all from one governed console.
+              Vault your credentials, broker approvals and watch just-in-time access rise and expire
+              — all from one governed console.
             </p>
 
             <ul className="lgx-pillars">
@@ -203,7 +203,12 @@ export const Login: React.FC = () => {
               </div>
             </div>
 
-            <button type="submit" id="login-submit-btn" className="lgx-submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              id="login-submit-btn"
+              className="lgx-submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <>
                   <span className="lgx-spinner" aria-hidden="true" />

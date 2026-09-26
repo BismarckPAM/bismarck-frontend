@@ -26,7 +26,7 @@ export const App: React.FC = () => {
     <BrowserRouter>
       <AuthProvider>
         <WorkflowProvider>
-          <Routes> 
+          <Routes>
             {/* Public Marketing Landing */}
             <Route path="/" element={<LandingPage />} />
             {/* Public Auth Route */}

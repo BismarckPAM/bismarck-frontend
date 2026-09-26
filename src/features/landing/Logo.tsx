@@ -1,10 +1,8 @@
-
 import { cn } from '@/lib/cn';
-
 
 export function BismarckMark({ className }: { className?: string }) {
   return (
-      <img
+    <img
       src="/favicon.svg"
       alt="Bismarck Logo"
       style={{ width: '66px', height: '66px', minWidth: '66px' }}

@@ -79,7 +79,7 @@
 }
 
 .primary-action-btn {
-  background: var(--accent-brand, #C1359E);
+  background: var(--accent-brand, #c1359e);
   color: #2b001f;
   font-weight: 600;
 }
