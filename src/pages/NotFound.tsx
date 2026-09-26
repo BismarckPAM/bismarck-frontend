@@ -4,27 +4,23 @@ import { ShieldX, Home } from 'lucide-react';
 
 export const NotFound: React.FC = () => {
   return (
-    <div className="login-container">
-      <div className="login-card-wrapper">
-        <div className="login-card" style={{ textAlign: 'center' }}>
-          <div className="brand-icon-shield" style={{ margin: '0 auto 1.5rem' }}>
-            <ShieldX size={36} color="#ef4444" />
-          </div>
-          <h1 className="brand-title" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-            404 - Access Point Not Found
-          </h1>
-          <p className="brand-subtitle" style={{ marginBottom: '2rem' }}>
-            The privileged route or resource you requested does not exist or has been relocated.
-          </p>
-          <Link
-            to="/users"
-            className="submit-btn"
-            style={{ display: 'inline-flex', textDecoration: 'none', justifyContent: 'center' }}
-          >
-            <Home size={18} style={{ marginRight: '8px' }} />
-            <span>Return to Dashboard</span>
-          </Link>
+    <div className="lgx-shell lgx-shell--center">
+      <div className="lgx-card lgx-card--center">
+        <div className="lgx-mark-badge">
+          <ShieldX size={34} color="#e11d48" />
         </div>
+        <h1 className="lgx-title">404 - Access Point Not Found</h1>
+        <p className="lgx-subtitle" style={{ marginBottom: '1.75rem' }}>
+          The privileged route or resource you requested does not exist or has been relocated.
+        </p>
+        <Link
+          to="/users"
+          className="lgx-submit"
+          style={{ display: 'inline-flex', width: 'auto', textDecoration: 'none' }}
+        >
+          <Home size={18} />
+          <span>Return to Dashboard</span>
+        </Link>
       </div>
     </div>
   );
