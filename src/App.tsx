@@ -5,6 +5,7 @@ import { WorkflowProvider } from './state/WorkflowProvider';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RequireRole from './components/auth/RequireRole';
 import AppLayout from './components/layout/AppLayout';
+import LandingPage from './features/landing/LandingPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import RequestAccess from './pages/RequestAccess';
@@ -26,6 +27,8 @@ export const App: React.FC = () => {
       <AuthProvider>
         <WorkflowProvider>
           <Routes>
+            {/* Public Marketing Landing */}
+            <Route path="/" element={<LandingPage />} />
             {/* Public Auth Route */}
             <Route path="/login" element={<Login />} />
 
