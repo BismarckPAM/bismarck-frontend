@@ -126,8 +126,7 @@ export const RequestAccess: React.FC = () => {
         <div>
           <h1 className="page-title">Request Access</h1>
           <p className="page-description">
-            Submit a privileged-access request for approval. Endpoint:{' '}
-            <code>POST /api/approval/requests</code>.
+            Submit a privileged-access request for approval.
           </p>
         </div>
       </div>
