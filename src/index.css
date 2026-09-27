@@ -13,13 +13,13 @@
 
   --border-subtle: rgba(113, 0, 95, 0.1);
   --border-medium: rgba(113, 0, 95, 0.18);
-  --border-focus: #B41597;
+  --border-focus: #b41597;
 
   --text-primary: #2b1626;
   --text-secondary: #6f5b6d;
   --text-muted: #99899b;
 
-  --accent-brand: #71005F;
+  --accent-brand: #71005f;
   --accent-brand-glow: rgba(113, 0, 95, 0.16);
   --accent-info: #4f46e5;
   --accent-info-glow: rgba(79, 70, 229, 0.16);
@@ -299,8 +299,7 @@ body {
   justify-content: center;
   padding: clamp(28px, 5vw, 56px) clamp(20px, 4vw, 48px);
   background:
-    radial-gradient(700px 420px at 50% -10%, rgba(155, 13, 129, 0.06), transparent 65%),
-    #fdfafc;
+    radial-gradient(700px 420px at 50% -10%, rgba(155, 13, 129, 0.06), transparent 65%), #fdfafc;
   overflow-y: auto;
 }
 
@@ -790,11 +789,7 @@ body {
 
 .nav-item.active {
   color: #ffffff;
-  background: linear-gradient(
-    90deg,
-    rgba(155, 13, 129, 0.38),
-    rgba(155, 13, 129, 0.12)
-  );
+  background: linear-gradient(90deg, rgba(155, 13, 129, 0.38), rgba(155, 13, 129, 0.12));
   border-color: rgba(155, 13, 129, 0.45);
   font-weight: 600;
 }
@@ -996,7 +991,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  background: linear-gradient(135deg, #B41597, #71005F);
+  background: linear-gradient(135deg, #b41597, #71005f);
   border: none;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
@@ -1723,7 +1718,7 @@ body {
 }
 
 .primary-action-btn {
-  background: linear-gradient(135deg, #B41597, #71005F);
+  background: linear-gradient(135deg, #b41597, #71005f);
   border-color: transparent;
   color: #ffffff;
 }

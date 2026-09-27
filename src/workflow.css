@@ -44,7 +44,7 @@
 }
 
 .form-input:focus {
-  outline: 2px solid var(--accent-brand, #71005F);
+  outline: 2px solid var(--accent-brand, #71005f);
   outline-offset: 1px;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .primary-action-btn {
-  background: var(--accent-brand, #71005F);
+  background: var(--accent-brand, #71005f);
   color: #ffffff;
   font-weight: 600;
 }
@@ -105,7 +105,7 @@
 .link-btn {
   background: transparent;
   border: none;
-  color: var(--accent-brand, #71005F);
+  color: var(--accent-brand, #71005f);
   padding: 4px;
 }
 
@@ -290,7 +290,7 @@
 }
 
 .notification-feed-item.unread {
-  border-left: 3px solid var(--accent-brand, #71005F);
+  border-left: 3px solid var(--accent-brand, #71005f);
 }
 
 .notification-feed-header {
@@ -388,7 +388,7 @@
   width: 28px;
   height: 28px;
   border: 3px solid rgba(113, 0, 95, 0.15);
-  border-top-color: var(--accent-brand, #71005F);
+  border-top-color: var(--accent-brand, #71005f);
   border-radius: 50%;
   animation: wf-spin 0.8s linear infinite;
 }

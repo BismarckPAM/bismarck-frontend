@@ -107,9 +107,7 @@ export const ApprovalQueue: React.FC = () => {
       <div className="page-header-row">
         <div>
           <h1 className="page-title">Approval Queue</h1>
-          <p className="page-description">
-            Pending access requests awaiting a decision. 
-          </p>
+          <p className="page-description">Pending access requests awaiting a decision.</p>
         </div>
         <button type="button" className="secondary-action-btn" onClick={() => void load()}>
           <RefreshCw size={16} aria-hidden="true" />
