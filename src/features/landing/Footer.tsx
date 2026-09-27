@@ -40,7 +40,7 @@ export function Footer() {
             <BismarckLogo />
             <p className="lnd-footer-blurb">
               Enterprise privileged access management. Vault every secret, record every session, and
-              prove compliance — without slowing your engineers down.
+              prove compliance without slowing your engineers down.
             </p>
             <p className="lnd-footer-copy">
               © {new Date().getFullYear()} Bismarck Security, Inc.

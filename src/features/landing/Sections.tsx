@@ -111,7 +111,7 @@ const FEATURES: Array<{ icon: LucideIcon; title: string; description: string }> 
     icon: KeySquare,
     title: 'Credential Vaulting',
     description:
-      'Rotate and store every privileged secret — passwords, SSH keys, API tokens — in a FIPS 140-2 validated vault with AES-256 encryption at rest and automatic rotation policies.',
+      'Rotate and store every privileged secret passwords, SSH keys, API tokens in a FIPS 140-2 validated vault with AES-256 encryption at rest and automatic rotation policies.',
   },
   {
     icon: Video,
@@ -123,7 +123,7 @@ const FEATURES: Array<{ icon: LucideIcon; title: string; description: string }> 
     icon: Timer,
     title: 'Just-in-Time Access',
     description:
-      'Eliminate standing privileges. Grant time-boxed elevation that auto-expires — 30 minutes of root when needed, zero permanent superusers ever again.',
+      'Eliminate standing privileges. Grant time-boxed elevation that auto-expires 30 minutes of root when needed, zero permanent superusers ever again.',
   },
   {
     icon: GitPullRequestArrow,
@@ -141,7 +141,7 @@ const FEATURES: Array<{ icon: LucideIcon; title: string; description: string }> 
     icon: Radar,
     title: 'Threat Analytics',
     description:
-      'Behavioral baselining flags anomalous privileged activity in real time — impossible travel, off-hours vault reads, unusual command sequences — and can auto-terminate sessions.',
+      'Behavioral baselining flags anomalous privileged activity in real time impossible travel, off-hours vault reads, unusual command sequences and can auto-terminate sessions.',
   },
 ];
 
@@ -184,14 +184,14 @@ const STEPS: Array<{ step: string; icon: LucideIcon; title: string; description:
     icon: Lock,
     title: 'Onboard & vault',
     description:
-      'Discover privileged accounts across your estate and import them into the encrypted vault. Automatic rotation starts immediately — no credential ever leaves the appliance unencrypted.',
+      'Discover privileged accounts across your estate and import them into the encrypted vault. Automatic rotation starts immediately no credential ever leaves the appliance unencrypted.',
   },
   {
     step: '02',
     icon: GitPullRequestArrow,
     title: 'Request & approve',
     description:
-      'Engineers request access with business justification. Approvers review context — target, duration, command scope — and grant time-boxed elevation from Slack, Teams, or the console.',
+      'Engineers request access with business justification. Approvers review context target, duration, command scope and grant time-boxed elevation from Slack, Teams, or the console.',
   },
   {
     step: '03',
@@ -258,7 +258,7 @@ const SECURITY_POINTS = [
   {
     title: 'Immutable audit lake',
     description:
-      'Write-once audit storage with cryptographic chaining — any tampering attempt is detectable and provable.',
+      'Write-once audit storage with cryptographic chaining any tampering attempt is detectable and provable.',
   },
   {
     title: 'Air-gapped deployment options',
@@ -282,7 +282,7 @@ export function Security() {
               <span className="lnd-gradient-text">Trusted by auditors.</span>
             </h2>
             <p className="lnd-security-copy">
-              Bismarck was designed from day one for the strictest regulated environments — banking,
+              Bismarck was designed from day one for the strictest regulated environments banking,
               healthcare, and critical infrastructure. Cryptographic integrity, least-privilege
               enforcement, and examiner-ready evidence are not add-ons; they are the architecture.
             </p>
@@ -317,11 +317,11 @@ export function Security() {
 const FAQS = [
   {
     q: 'How is Bismarck deployed?',
-    a: 'Bismarck ships as a hardened virtual appliance or Kubernetes deployment that runs entirely in your environment — on-premises, in your VPC, or air-gapped. No privileged credential or session recording ever leaves your infrastructure.',
+    a: 'Bismarck ships as a hardened virtual appliance or Kubernetes deployment that runs entirely in your environment on-premises, in your VPC, or air-gapped. No privileged credential or session recording ever leaves your infrastructure.',
   },
   {
     q: 'Will it slow my engineers down?',
-    a: 'No. Engineers keep their normal SSH, RDP, and web workflows — Bismarck sits transparently as a broker. Just-in-time elevation is typically approved in under two minutes, and break-glass paths guarantee emergency access within seconds.',
+    a: 'No. Engineers keep their normal SSH, RDP, and web workflows Bismarck sits transparently as a broker. Just-in-time elevation is typically approved in under two minutes, and break-glass paths guarantee emergency access within seconds.',
   },
   {
     q: 'Which targets and protocols are supported?',
