@@ -13,13 +13,14 @@ import {
   ClipboardCheck,
   KeyRound,
   ScrollText,
+  UserPlus,
   Bell,
   Menu,
   X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import NotificationBell from '../notifications/NotificationBell';
-import { isApprover, canViewAudit } from '../../auth/roles';
+import { isApprover, canViewAudit, isAdmin } from '../../auth/roles';
 import { BismarckMark } from '../../features/landing/Logo';
 
 interface NavItemConfig {
@@ -42,6 +43,7 @@ export const AppLayout: React.FC = () => {
   const [lastPath, setLastPath] = useState(location.pathname);
   const approver = isApprover(user);
   const auditVisible = canViewAudit(user);
+  const adminVisible = isAdmin(user);
 
   // Close the off-canvas sidebar whenever the route changes
   // (state adjusted during render — React's recommended pattern).
@@ -113,6 +115,16 @@ export const AppLayout: React.FC = () => {
           label: 'Privileged Resources',
           aria: 'Privileged Resources',
         },
+        ...(adminVisible
+          ? [
+              {
+                to: '/onboarding',
+                icon: UserPlus,
+                label: 'Onboarding',
+                aria: 'Onboarding requests',
+              },
+            ]
+          : []),
         ...(auditVisible
           ? [{ to: '/audit', icon: ScrollText, label: 'Audit Log', aria: 'Audit log' }]
           : []),
