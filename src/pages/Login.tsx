@@ -28,7 +28,7 @@ const PILLARS = [
   {
     icon: ScrollText,
     title: 'Immutable audit trail',
-    desc: 'Approvals, sessions and keystrokes — tamper-evident.',
+    desc: 'Approvals, sessions and keystrokes tamper-evident.',
   },
 ] as const;
 
@@ -100,7 +100,7 @@ export const Login: React.FC = () => {
             </p>
             <p className="lgx-lede">
               Vault your credentials, broker approvals and watch just-in-time access rise and expire
-              — all from one governed console.
+              all from one governed console.
             </p>
 
             <ul className="lgx-pillars">
@@ -123,7 +123,7 @@ export const Login: React.FC = () => {
               <span className="lgx-ticker-dot" />
               <code>PAM-2481 · vault-rotate · approved · 22m remaining</code>
             </div>
-            <p className="lgx-copyright">© 2026 Bismarck — privileged access, governed.</p>
+            <p className="lgx-copyright">© 2026 Bismarck - privileged access, governed.</p>
           </div>
         </div>
       </aside>
@@ -228,7 +228,8 @@ export const Login: React.FC = () => {
           </div>
 
           <p className="lgx-alt">
-            Need an account or access? <Link to="/">Raise a ticket on the homepage</Link>
+            Need an account or access? &nbsp;&nbsp;&nbsp;&nbsp;{' '}
+            <Link to="/"> Raise a ticket on the homepage</Link>
           </p>
 
           {/* Footer Security Badge */}

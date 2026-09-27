@@ -93,7 +93,7 @@ export function Hero({ onGetStarted, onRequestAccess }: HeroProps) {
 
           <p className="lnd-hero-sub">
             Bismarck is an enterprise-grade PAM platform that secures, records, and audits every
-            privileged identity across your infrastructure — servers, databases, cloud consoles, and
+            privileged identity across your infrastructure servers, databases, cloud consoles, and
             network devices. Eliminate standing privileges with just-in-time access and prove
             compliance with a complete, tamper-evident audit trail.
           </p>
