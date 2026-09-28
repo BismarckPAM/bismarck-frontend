@@ -18,8 +18,8 @@ import { TicketDialog } from './TicketDialog';
  * its own dark design system untouched.
  *
  * "Login" routes to the real /login page (AuthContext flow).
- * "Raise a Ticket" opens a portal dialog that posts to the public tickets
- * endpoint (src/api/tickets.ts).
+ * "Raise a Ticket" opens a portal dialog that posts a public onboarding
+ * ticket (Turnstile-protected) via src/api/onboarding.ts.
  */
 export function LandingPage() {
   const navigate = useNavigate();

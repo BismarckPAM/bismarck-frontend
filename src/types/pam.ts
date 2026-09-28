@@ -96,6 +96,27 @@ export interface JitRevokeResult {
   revokedAt?: string;
 }
 
+export type OnboardingTicketStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+/**
+ * OnboardingTicketResponse — Identity Service.
+ * GET /api/admin/onboarding/tickets, POST .../{id}/approve|reject.
+ */
+export interface OnboardingTicket {
+  id: string;
+  fullName: string;
+  email: string;
+  department: string;
+  requestedRole: string;
+  justification: string;
+  status: OnboardingTicketStatus;
+  createdAt: string;
+  reviewedAt?: string | null;
+  reviewedBy?: string | null;
+  rejectionReason?: string | null;
+  provisionedUserId?: string | null;
+}
+
 /** PagedResult<T> from the Notification and Audit services. */
 export interface PagedResult<T> {
   items: T[];

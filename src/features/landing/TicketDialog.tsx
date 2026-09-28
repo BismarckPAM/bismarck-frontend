@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Ticket as TicketIcon, Send, Loader2, X, CheckCircle2 } from 'lucide-react';
-import { createTicket } from '@/api/tickets';
-import type { TicketRequestType } from '@/api/tickets';
+import {
+  createOnboardingTicket,
+  OnboardingSubmitError,
+  type OnboardingSubmitErrorCode,
+} from '@/api/onboarding';
+import { useTurnstile } from '@/hooks/useTurnstile';
 
-const REQUEST_TYPES: Array<{ value: TicketRequestType; label: string }> = [
-  { value: 'access', label: 'Access Request (PAM account)' },
-  { value: 'demo', label: 'Product Demo / Sandbox' },
-  { value: 'support', label: 'Technical Support' },
-  { value: 'pilot', label: 'Pilot / Proof of Concept' },
-  { value: 'other', label: 'Other' },
-];
+/** Roles a prospective user may request; final assignment is by an administrator. */
+const REQUESTED_ROLES = ['User', 'Manager', 'Admin'] as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,13 +25,19 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialogProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
-  const [requestType, setRequestType] = useState<'' | TicketRequestType>('');
-  const [message, setMessage] = useState('');
+  const [department, setDepartment] = useState('');
+  const [requestedRole, setRequestedRole] = useState('');
+  const [justification, setJustification] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [ticketRef, setTicketRef] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const turnstileRef = useRef<HTMLDivElement | null>(null);
+
+  // Cloudflare Turnstile is only wired up while the dialog is open.
+  const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY;
+  const turnstile = useTurnstile(open ? sitekey : undefined, turnstileRef);
+  const captchaBlocked = turnstile.isConfigured && !turnstile.token;
 
   // Lock page scroll (Lenis + native) while open; restore on close.
   useEffect(() => {
@@ -61,21 +66,24 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
   const reset = () => {
     setName('');
     setEmail('');
-    setCompany('');
-    setRequestType('');
-    setMessage('');
+    setDepartment('');
+    setRequestedRole('');
+    setJustification('');
     setStatus('idle');
     setErrorDetail(null);
     setTicketRef(null);
+    turnstile.reset();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorDetail(null);
 
-    if (!name.trim() || !email || !requestType || !message.trim()) {
+    if (!name.trim() || !email || !requestedRole || !justification.trim()) {
       setStatus('error');
-      setErrorDetail('Please fill in name, work email, request type, and message.');
+      setErrorDetail(
+        'Please fill in your full name, work email, requested role, and justification.',
+      );
       return;
     }
     if (!EMAIL_RE.test(email)) {
@@ -83,23 +91,42 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
       setErrorDetail('Enter a valid work email address.');
       return;
     }
+    if (captchaBlocked) {
+      setStatus('error');
+      setErrorDetail('Please complete the human verification challenge before submitting.');
+      return;
+    }
 
     setStatus('submitting');
     try {
-      const res = await createTicket({
-        name: name.trim(),
+      const res = await createOnboardingTicket({
+        fullName: name.trim(),
         email,
-        company: company.trim() || undefined,
-        requestType,
-        message: message.trim(),
+        department: department.trim(),
+        requestedRole,
+        justification: justification.trim(),
+        turnstileToken: turnstile.token ?? '',
       });
       setTicketRef(res.ticketId);
       setStatus('success');
-    } catch {
+    } catch (err) {
       setStatus('error');
-      setErrorDetail(
-        'Could not reach the ticket service. If this persists, email us directly at pam-onboarding@bismarck.security.',
-      );
+      const code: OnboardingSubmitErrorCode =
+        err instanceof OnboardingSubmitError ? err.code : 'UNKNOWN';
+      if (code === 'DUPLICATE') {
+        setErrorDetail(
+          'An account or pending request already exists for this email address. Sign in or contact an administrator.',
+        );
+      } else if (code === 'INVALID_CAPTCHA') {
+        setErrorDetail(
+          'Human verification failed. Please complete the verification and try again.',
+        );
+        turnstile.reset();
+      } else {
+        setErrorDetail(
+          'Could not reach the onboarding service. If this persists, email us directly at pam-onboarding@bismarck.security.',
+        );
+      }
     }
   };
 
@@ -194,36 +221,36 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
 
               <div className="lnd-form-row">
                 <div className="lnd-field">
-                  <label htmlFor="lnd-t-company" className="lnd-label">
-                    Organization
+                  <label htmlFor="lnd-t-department" className="lnd-label">
+                    Department
                   </label>
                   <input
-                    id="lnd-t-company"
+                    id="lnd-t-department"
                     className="lnd-input"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    placeholder="Acme Corp"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    placeholder="Engineering"
                     disabled={status === 'submitting'}
                     autoComplete="organization"
                   />
                 </div>
                 <div className="lnd-field">
-                  <label htmlFor="lnd-t-type" className="lnd-label">
-                    Request type *
+                  <label htmlFor="lnd-t-role" className="lnd-label">
+                    Requested role *
                   </label>
                   <select
-                    id="lnd-t-type"
+                    id="lnd-t-role"
                     className="lnd-select"
-                    value={requestType}
-                    onChange={(e) => setRequestType(e.target.value as '' | TicketRequestType)}
+                    value={requestedRole}
+                    onChange={(e) => setRequestedRole(e.target.value)}
                     disabled={status === 'submitting'}
                   >
                     <option value="" disabled>
-                      Select a type
+                      Select a role
                     </option>
-                    {REQUEST_TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>
-                        {t.label}
+                    {REQUESTED_ROLES.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
                       </option>
                     ))}
                   </select>
@@ -231,19 +258,27 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
               </div>
 
               <div className="lnd-field">
-                <label htmlFor="lnd-t-message" className="lnd-label">
-                  Message *
+                <label htmlFor="lnd-t-justification" className="lnd-label">
+                  Justification *
                 </label>
                 <textarea
-                  id="lnd-t-message"
+                  id="lnd-t-justification"
                   className="lnd-textarea"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Tell us about your environment — number of privileged accounts, targets (servers, databases, cloud consoles), and what you'd like to achieve."
+                  value={justification}
+                  onChange={(e) => setJustification(e.target.value)}
+                  placeholder="Describe your role and why you need access to privileged resources."
                   rows={4}
                   disabled={status === 'submitting'}
                 />
               </div>
+
+              {turnstile.isConfigured ? (
+                <div ref={turnstileRef} className="lnd-turnstile" aria-live="polite" />
+              ) : (
+                <div className="lnd-notice" role="note">
+                  Human verification is disabled in this environment.
+                </div>
+              )}
 
               {status === 'error' && errorDetail && (
                 <div className="lnd-notice error" role="alert">
