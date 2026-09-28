@@ -83,6 +83,7 @@ jobs:
         env:
           VITE_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
           VITE_AUTHORIZATION_API_URL: https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+          VITE_TURNSTILE_SITEKEY: ${{ secrets.VITE_TURNSTILE_SITEKEY }}
         run: npm run build
 
   # ============================================================
@@ -149,6 +150,7 @@ jobs:
           build-args: |
             VITE_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
             VITE_AUTHORIZATION_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
+            VITE_TURNSTILE_SITEKEY=${{ secrets.VITE_TURNSTILE_SITEKEY }}
 
           tags: |
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend-ui:${{ github.sha }}
