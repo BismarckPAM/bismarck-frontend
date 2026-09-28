@@ -14,13 +14,18 @@ vi.mock('lenis', () => {
   return { default: LenisStub };
 });
 
-// Avoid real network calls from the ticket dialog.
-vi.mock('@/api/tickets', () => ({
-  createTicket: vi.fn(async () => ({ ticketId: 'PAM-TEST1234' })),
+// Avoid real network calls from the onboarding ticket dialog.
+vi.mock('@/api/onboarding', () => ({
+  createOnboardingTicket: vi.fn(async () => ({
+    ticketId: 'PAM-TEST1234',
+    status: 'PENDING',
+    message: 'Ticket received',
+  })),
+  OnboardingSubmitError: class OnboardingSubmitError extends Error {},
 }));
 
 import { LandingPage } from '../LandingPage';
-import { createTicket } from '@/api/tickets';
+import { createOnboardingTicket } from '@/api/onboarding';
 
 function renderLanding() {
   return render(
@@ -62,20 +67,21 @@ describe('LandingPage', () => {
     // Submit empty -> validation error notice
     fireEvent.submit(document.querySelector('.lnd-form')!);
     expect(await screen.findByRole('alert')).toHaveTextContent(/Please fill in/i);
-    expect(createTicket).not.toHaveBeenCalled();
+    expect(createOnboardingTicket).not.toHaveBeenCalled();
 
     // Fill the form and submit
     fireEvent.change(screen.getByLabelText(/Full name \*/i), { target: { value: 'Alex Kumar' } });
     fireEvent.change(screen.getByLabelText(/Work email \*/i), {
       target: { value: 'alex@company.com' },
     });
-    fireEvent.change(screen.getByLabelText(/Request type \*/i), { target: { value: 'demo' } });
-    fireEvent.change(screen.getByLabelText(/Message \*/i), {
+    fireEvent.change(screen.getByLabelText(/Department/i), { target: { value: 'Engineering' } });
+    fireEvent.change(screen.getByLabelText(/Requested role \*/i), { target: { value: 'User' } });
+    fireEvent.change(screen.getByLabelText(/Justification \*/i), {
       target: { value: 'We need PAM for 50 servers.' },
     });
     fireEvent.submit(document.querySelector('.lnd-form')!);
 
-    await waitFor(() => expect(createTicket).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(createOnboardingTicket).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/Ticket submitted/i)).toBeInTheDocument();
     expect(screen.getByText('PAM-TEST1234')).toBeInTheDocument();
   });

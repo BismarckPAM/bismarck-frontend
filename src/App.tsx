@@ -18,8 +18,9 @@ import Users from './pages/Users';
 import Resources from './pages/Resources';
 import Policies from './pages/Policies';
 import AccessCheck from './pages/AccessCheck';
+import Onboarding from './pages/Onboarding';
 import NotFound from './pages/NotFound';
-import { isApprover, canViewAudit } from './auth/roles';
+import { isApprover, canViewAudit, isAdmin } from './auth/roles';
 
 export const App: React.FC = () => {
   return (
@@ -63,6 +64,14 @@ export const App: React.FC = () => {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/access-check" element={<AccessCheck />} />
+                <Route
+                  path="/onboarding"
+                  element={
+                    <RequireRole allowed={isAdmin}>
+                      <Onboarding />
+                    </RequireRole>
+                  }
+                />
               </Route>
             </Route>
 
