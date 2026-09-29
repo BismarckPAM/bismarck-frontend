@@ -606,3 +606,48 @@
     flex-direction: column;
   }
 }
+
+/* ---- JIT connect panel ---------------------------------------------------- */
+/* Shows the exact command a user runs to reach a granted Azure VM. Access is
+   only possible while the session is ACTIVE, because the "Virtual Machine User
+   Login" role assignment exists for that window only. */
+
+.wf-connect-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--wf-border, #d7dce5);
+  border-left: 3px solid var(--wf-accent, #2f6feb);
+  border-radius: 8px;
+  background: var(--wf-surface-muted, #f7f9fc);
+}
+
+.wf-connect-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wf-connect-command {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wf-connect-command code {
+  flex: 1 1 320px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--wf-code-bg, #10182a);
+  color: var(--wf-code-fg, #d7e2ff);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  white-space: pre;
+}

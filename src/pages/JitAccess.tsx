@@ -1,41 +1,74 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldOff, RefreshCw } from 'lucide-react';
-import { useWorkflow } from '../state/WorkflowContext';
 import { useAuth } from '../context/useAuth';
 import { canRevokePermissions } from '../auth/roles';
-import { revokeTemporaryPermission } from '../api/jit';
+import { listJitSessions, revokeTemporaryPermission } from '../api/jit';
 import { isApiError } from '../api/errors';
 import { Modal } from '../components/common/Modal';
-import { EmptyState, UnsupportedNotice } from '../components/common/StateViews';
+import { EmptyState, LoadingState, UnsupportedNotice } from '../components/common/StateViews';
 import useResources from '../hooks/useResources';
-import { formatDateTime, formatDuration, levelLabel } from '../utils/format';
+import { formatDateTime, levelLabel } from '../utils/format';
 import { capabilities } from '../api/config';
-import type { ApiError } from '../types/pam';
+import type { ApiError, JitSession } from '../types/pam';
 
 /**
  * Just-In-Time access.
  *
- * Backend reality (verified): JIT grants are provisioned automatically when an
- * approval request is GRANTED (the `approval-granted` event creates the
- * temporary permission). There is NO standalone JIT request endpoint and NO
- * "list JIT permissions" endpoint. The only JIT mutation is an Admin-only
- * manual revoke: POST /api/authorization/permissions/{id}/revoke.
+ * Reads the AUTHORITATIVE list of JIT sessions from the Authorization Service
+ * (`GET /api/jit/sessions`). A session is a `TemporaryPermission` row created
+ * when the Authorization Service consumes the `approval-granted` Kafka event —
+ * so if this list is empty after an approval, the event has not been processed
+ * yet (or the broker is unreachable). It is NOT derived from approval requests.
+ *
+ * `provisioningStatus` distinguishes a real cloud grant (`ACTIVE`, the Azure ARM
+ * role assignment succeeded) from `LOCAL_ONLY`, which is the expected state in
+ * local dev / CI where no Azure tenant is configured. A local-only session is
+ * still a real, tracked, expiring session.
+ *
+ * The only JIT mutation is an Admin-only manual revoke.
  */
 export const JitAccess: React.FC = () => {
-  const { myRequests, updateMyRequest, refreshNotifications } = useWorkflow();
   const { user } = useAuth();
   const { resourceName } = useResources();
 
+  const [sessions, setSessions] = useState<JitSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [revokeId, setRevokeId] = useState<string | null>(null);
   const [revokeReason, setRevokeReason] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const approved = useMemo(
-    () => myRequests.filter((request) => request.status === 'APPROVED'),
-    [myRequests],
-  );
+  // Local ticking clock so the countdown updates without hammering the API.
+  // The authoritative values come from the server on each load.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const load = useCallback(async () => {
+    if (!capabilities.jitList) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setLoadError(null);
+    try {
+      setSessions(await listJitSessions());
+    } catch (err) {
+      setLoadError(isApiError(err) ? err.message : 'Unable to load JIT sessions.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial fetch of the authoritative session list.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void load();
+  }, [load]);
 
   const handleRevoke = async () => {
     if (!revokeId) return;
@@ -44,10 +77,10 @@ export const JitAccess: React.FC = () => {
     try {
       const result = await revokeTemporaryPermission(revokeId);
       setMessage(result.message || `Permission ${revokeId} revoked.`);
-      updateMyRequest(revokeId, { status: 'APPROVED' });
-      void refreshNotifications();
       setRevokeId(null);
       setRevokeReason('');
+      // Re-read from the server so the row flips to REVOKED authoritatively.
+      void load();
     } catch (err) {
       setError(
         isApiError(err)
@@ -59,23 +92,100 @@ export const JitAccess: React.FC = () => {
     }
   };
 
+  const active = sessions.filter((session) => session.status === 'ACTIVE');
+  const history = sessions.filter((session) => session.status !== 'ACTIVE');
+  const connectable = active.filter((session) => Boolean(session.connectionCommand));
+
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyCommand = async (session: JitSession) => {
+    if (!session.connectionCommand) return;
+    try {
+      await navigator.clipboard.writeText(session.connectionCommand);
+      setCopiedId(session.id);
+      window.setTimeout(
+        () => setCopiedId((current) => (current === session.id ? null : current)),
+        2000,
+      );
+    } catch {
+      // Clipboard can be blocked (insecure context / permissions). The command
+      // is still visible on screen, so this is not worth surfacing as an error.
+    }
+  };
+
+  const remainingLabel = (session: JitSession): string => {
+    if (session.status !== 'ACTIVE') return '—';
+    const seconds = Math.max(0, Math.floor((new Date(session.expiresAt).getTime() - now) / 1000));
+    if (seconds <= 0) return 'Expired';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+  };
+
+  const renderRow = (session: JitSession) => (
+    <tr key={session.id} className="pam-table-row">
+      <td className="wf-mono">{session.id.slice(0, 8)}…</td>
+      <td>{session.resourceName || resourceName(session.resourceId)}</td>
+      <td>{levelLabel(session.requestedLevel)}</td>
+      <td>{formatDateTime(session.grantedAt)}</td>
+      <td>
+        {remainingLabel(session)}
+        {session.provisioningStatus && (
+          <div className="wf-hint">Provisioning: {session.provisioningStatus}</div>
+        )}
+      </td>
+      <td className="wf-actions-cell">
+        {session.status === 'ACTIVE' && canRevokePermissions(user) && capabilities.jitRevoke ? (
+          <button
+            type="button"
+            className="reject-btn"
+            onClick={() => {
+              setRevokeId(session.id);
+              setRevokeReason('');
+            }}
+          >
+            <ShieldOff size={16} aria-hidden="true" />
+            <span>Revoke</span>
+          </button>
+        ) : (
+          <span className="wf-hint">
+            {session.status === 'ACTIVE' ? 'Admin only' : session.status}
+          </span>
+        )}
+      </td>
+    </tr>
+  );
+
   return (
     <section className="page-container">
       <div className="page-header-row">
         <div>
           <h1 className="page-title">JIT Access</h1>
           <p className="page-description">
-            Just-In-Time (temporary) privileged access. JIT grants are provisioned automatically
-            when an approval request is approved.
+            Just-In-Time (temporary) privileged access. A session is created automatically when an
+            approval request is approved, and expires on its own.
           </p>
         </div>
+        <button
+          type="button"
+          className="secondary-action-btn"
+          onClick={() => void load()}
+          disabled={loading}
+        >
+          <RefreshCw size={16} aria-hidden="true" />
+          <span>{loading ? 'Refreshing…' : 'Refresh'}</span>
+        </button>
       </div>
-
-      <UnsupportedNotice message="The backend has no standalone JIT request endpoint and no 'list JIT permissions' endpoint. JIT grants are created by the approval-granted event. Only an Admin can manually revoke a temporary permission." />
 
       {message && (
         <div className="wf-success" role="status">
           {message}
+        </div>
+      )}
+      {loadError && (
+        <div className="wf-error" role="alert">
+          {loadError}
         </div>
       )}
       {error && (
@@ -84,55 +194,91 @@ export const JitAccess: React.FC = () => {
         </div>
       )}
 
-      <h2 className="panel-title">Active JIT sessions (from this session)</h2>
-      {approved.length === 0 ? (
+      <h2 className="panel-title">Active JIT sessions</h2>
+      {!capabilities.jitList ? (
+        <UnsupportedNotice message="JIT session listing is disabled by configuration." />
+      ) : loading && sessions.length === 0 ? (
+        <LoadingState message="Loading JIT sessions…" />
+      ) : active.length === 0 ? (
         <EmptyState
           title="No active JIT sessions"
-          message="Approved requests in this session will appear here once a temporary grant is issued."
+          message="Once an approval request is approved, the temporary grant appears here and counts down to automatic expiry."
         />
       ) : (
         <div className="table-responsive-wrapper">
           <table className="pam-data-table" aria-label="Active JIT sessions">
             <thead>
               <tr>
-                <th scope="col">Request</th>
+                <th scope="col">Session</th>
                 <th scope="col">Resource</th>
                 <th scope="col">Level</th>
                 <th scope="col">Granted</th>
-                <th scope="col">Duration</th>
+                <th scope="col">Remaining</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {approved.map((request) => (
-                <tr key={request.id} className="pam-table-row">
-                  <td className="wf-mono">{request.id.slice(0, 8)}…</td>
-                  <td>{resourceName(request.resourceId)}</td>
-                  <td>{levelLabel(request.requestedLevel)}</td>
-                  <td>{formatDateTime(request.reviewedAt)}</td>
-                  <td>{formatDuration(request.durationMinutes)}</td>
-                  <td className="wf-actions-cell">
-                    {canRevokePermissions(user) && capabilities.jitRevoke ? (
-                      <button
-                        type="button"
-                        className="reject-btn"
-                        onClick={() => {
-                          setRevokeId(request.id);
-                          setRevokeReason('');
-                        }}
-                      >
-                        <ShieldOff size={16} aria-hidden="true" />
-                        <span>Revoke</span>
-                      </button>
-                    ) : (
-                      <span className="wf-hint">Admin only</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            <tbody>{active.map(renderRow)}</tbody>
           </table>
         </div>
+      )}
+
+      {connectable.length > 0 && (
+        <>
+          <h2 className="panel-title">Connect to your granted machines</h2>
+          <p className="wf-hint">
+            These commands work only while the session is <strong>ACTIVE</strong>. Access is
+            authorised by an Azure role assignment that is removed automatically when the timer
+            reaches zero, or when an administrator revokes it.
+          </p>
+          {connectable.map((session) => (
+            <div key={session.id} className="wf-connect-card">
+              <div className="wf-connect-head">
+                <div>
+                  <strong>{session.resourceName || session.targetVmName || 'Machine'}</strong>
+                  {session.targetVmName && (
+                    <span className="wf-hint"> ({session.targetVmName})</span>
+                  )}
+                </div>
+                <span className="wf-hint">{session.targetOsType || 'Linux'}</span>
+              </div>
+              <div className="wf-connect-command">
+                <code>{session.connectionCommand}</code>
+                <button
+                  type="button"
+                  className="secondary-action-btn"
+                  onClick={() => void copyCommand(session)}
+                >
+                  {copiedId === session.id ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <div className="wf-hint">
+                Expires in {remainingLabel(session)}
+                {session.provisioningStatus && ` · Provisioning: ${session.provisioningStatus}`}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {history.length > 0 && (
+        <>
+          <h2 className="panel-title">Expired &amp; revoked sessions</h2>
+          <div className="table-responsive-wrapper">
+            <table className="pam-data-table" aria-label="Expired and revoked JIT sessions">
+              <thead>
+                <tr>
+                  <th scope="col">Session</th>
+                  <th scope="col">Resource</th>
+                  <th scope="col">Level</th>
+                  <th scope="col">Granted</th>
+                  <th scope="col">Remaining</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>{history.map(renderRow)}</tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {revokeId && (
@@ -165,7 +311,7 @@ export const JitAccess: React.FC = () => {
             </div>
           )}
           <p>
-            Revoke the temporary permission for request <strong>{revokeId}</strong>? Endpoint:{' '}
+            Revoke the temporary permission for session <strong>{revokeId}</strong>? Endpoint:{' '}
             <code>POST /api/authorization/permissions/{revokeId}/revoke</code>.
           </p>
           <label className="form-group" htmlFor="revokeReason">

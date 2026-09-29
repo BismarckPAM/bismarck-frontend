@@ -1,19 +1,24 @@
 import { createContext, useContext } from 'react';
-import type { ApprovalRequest, NotificationItem } from '../types/pam';
+import type { ApprovalRequest, NotificationItem, RequestCounters } from '../types/pam';
 
 /**
- * Session-scoped workflow state.
+ * Cross-screen workflow state.
  *
- * IMPORTANT: the backend has no "list my own requests" endpoint, so requests a
- * user submits are tracked client-side for the current session only. They are
- * clearly labelled in the UI as session-scoped and are not presented as a
- * complete server-side history.
+ * `myRequests` is served by the backend (`GET /api/approval/requests/me`) and is
+ * therefore a full server-side history that survives page reloads and new
+ * browser sessions. `addMyRequest` still optimistically prepends a newly
+ * created request so the UI updates immediately without waiting for a refetch.
  */
 export interface WorkflowContextValue {
-  /** Requests submitted by the current user during this browser session. */
+  /** The authenticated user's requests, newest first, from the server. */
   myRequests: ApprovalRequest[];
+  /** Aggregate counters from the server response (total/pending/approved/rejected). */
+  myRequestCounters: RequestCounters;
+  myRequestsLoading: boolean;
+  myRequestsError: string | null;
   addMyRequest: (request: ApprovalRequest) => void;
   updateMyRequest: (id: string, patch: Partial<ApprovalRequest>) => void;
+  refreshMyRequests: () => Promise<void>;
 
   /** Notifications for the current user. */
   notifications: NotificationItem[];

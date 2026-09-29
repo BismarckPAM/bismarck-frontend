@@ -24,20 +24,21 @@ export const env = {
  * without touching any screen.
  *
  * Known backend gaps (verified against backend source):
- *  - No "list my own requests" endpoint. GET /api/approval/requests returns the
- *    full PENDING queue and is restricted to approvers.
+ *  - `GET /api/approval/requests/me` now exists (Approval Service), so
+ *    "My Requests" is served from the database and survives page reloads.
  *  - No notification mark-as-read endpoint (notifications are an immutable log).
- *  - No JIT "list permissions" / standalone JIT request endpoint; JIT grants are
- *    created by the `approval-granted` Kafka event.
+ *  - JIT grants are created by the `approval-granted` Kafka event; there is no
+ *    standalone JIT request endpoint. Sessions ARE listable via
+ *    `GET /api/jit/sessions`, so `jitList` is enabled.
  */
 const baselineCapabilities: BackendCapabilities = {
   approvalPendingQueue: true,
   approvalGetById: true,
-  approvalMyRequests: false,
+  approvalMyRequests: true,
   notificationsList: true,
   notificationsMarkRead: false,
   auditList: true,
-  jitList: false,
+  jitList: true,
   jitRequest: false,
   jitRevoke: true,
 };
