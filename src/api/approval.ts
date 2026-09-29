@@ -4,7 +4,9 @@ import {
   normalizeApprovalStatus,
   type ApprovalRequest,
   type CreateApprovalRequest,
+  type MyRequestsResponse,
   type RejectApprovalRequest,
+  type RequestCounters,
 } from '../types/pam';
 
 /** Normalize a raw Approval Service payload into a typed ApprovalRequest. */
@@ -55,6 +57,42 @@ export async function listPendingApprovalRequests(): Promise<ApprovalRequest[]> 
   return withNormalizedError(async () => {
     const { data } = await identityClient.get<Record<string, unknown>[]>('/api/approval/requests');
     return Array.isArray(data) ? data.map(toApprovalRequest) : [];
+  });
+}
+
+/**
+ * Fetch the authenticated user's own request history from the server.
+ * GET /api/approval/requests/me -> 200 MyRequestsResponse { items, counters }
+ *
+ * Unlike the approver-only `listPendingApprovalRequests`, this endpoint is
+ * available to every authenticated caller and returns their full history, so
+ * "My Requests" is not limited to the current browser session.
+ */
+export async function getMyRequests(): Promise<MyRequestsResponse> {
+  return withNormalizedError(async () => {
+    const { data } = await identityClient.get<Record<string, unknown>>(
+      '/api/approval/requests/me',
+    );
+
+    const rawItems = Array.isArray(data?.items) ? (data.items as Record<string, unknown>[]) : [];
+    const rawCounters = (data?.counters ?? {}) as Record<string, unknown>;
+
+    const num = (value: unknown): number => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    // Fall back to counting the items when the backend omits `counters`, so the
+    // summary never renders as all-zero against a non-empty list.
+    const items = rawItems.map(toApprovalRequest);
+    const counters: RequestCounters = {
+      total: num(rawCounters.total) || items.length,
+      pending: num(rawCounters.pending) || items.filter((r) => r.status === 'PENDING').length,
+      approved: num(rawCounters.approved) || items.filter((r) => r.status === 'APPROVED').length,
+      rejected: num(rawCounters.rejected) || items.filter((r) => r.status === 'REJECTED').length,
+    };
+
+    return { items, counters };
   });
 }
 

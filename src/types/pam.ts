@@ -54,6 +54,28 @@ export interface RejectApprovalRequest {
   reason: string;
 }
 
+/**
+ * Aggregate counters returned alongside the caller's own request history.
+ * Mirrors the backend `RequestCounters` record.
+ */
+export interface RequestCounters {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
+/**
+ * MyRequestsResponse — GET /api/approval/requests/me.
+ *
+ * Server-side history for the authenticated user, so it survives page reloads
+ * and new browser sessions (unlike client-session-only tracking).
+ */
+export interface MyRequestsResponse {
+  items: ApprovalRequest[];
+  counters: RequestCounters;
+}
+
 /** NotificationResponseDto — GET /api/notifications/{userId}. */
 export interface NotificationItem {
   id: string;

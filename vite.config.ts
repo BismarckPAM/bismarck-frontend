@@ -33,6 +33,13 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
       css: true,
+      // The suite runs 19 files in parallel. On a loaded CI runner the default
+      // 5s budget is not enough for the heavier page-level tests (Login /
+      // RequestAccess render large trees), which made LandingPage.test.tsx fail
+      // intermittently with "Test timed out in 5000ms" even though it completes
+      // in well under a second on its own.
+      testTimeout: 20000,
+      hookTimeout: 20000,
       // `.kilo` is a git worktree snapshot of this repo; excluding it prevents
       // duplicate test files from being discovered twice.
       exclude: ['**/node_modules/**', '**/dist/**', '**/.kilo/**'],
