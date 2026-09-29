@@ -50,6 +50,20 @@ const revokedSession: JitSession = {
   provisioningStatus: 'REVOKED',
 };
 
+/** A session whose resource is a real Azure VM, so a connect command exists. */
+const vmSession: JitSession = {
+  ...activeSession,
+  id: 'perm-77777-0000-0000-000000000000',
+  userEmail: 'alex@company.com',
+  resourceName: 'Bastion Host',
+  targetVmName: 'pam-demo-vm',
+  targetResourceGroup: 'pam-rg',
+  targetHost: '20.51.0.4',
+  targetOsType: 'Linux',
+  connectionCommand: 'ssh alex@20.51.0.4',
+  provisioningStatus: 'ACTIVE',
+};
+
 const emptyValue: WorkflowContextValue = {
   myRequests: [],
   myRequestCounters: { total: 0, pending: 0, approved: 0, rejected: 0 },
@@ -165,5 +179,33 @@ describe('JIT Access', () => {
     renderJit();
 
     expect(await screen.findByText(/Unable to reach the server\./i)).toBeInTheDocument();
+  });
+
+  it('shows the connect command for an active VM session', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([vmSession]);
+    renderJit();
+
+    expect(await screen.findByText(/Connect to your granted machines/i)).toBeInTheDocument();
+    expect(screen.getByText('ssh alex@20.51.0.4')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /copy/i })).toBeInTheDocument();
+  });
+
+  it('does not show a connect command for a non-VM session', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([activeSession]);
+    renderJit();
+
+    await screen.findByText('Prod DB');
+    expect(screen.queryByText(/Connect to your granted machines/i)).not.toBeInTheDocument();
+  });
+
+  it('hides the connect command once the session is no longer active', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([{ ...vmSession, status: 'EXPIRED' }]);
+    renderJit();
+
+    expect(await screen.findByText(/Expired & revoked sessions/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Connect to your granted machines/i)).not.toBeInTheDocument();
   });
 });

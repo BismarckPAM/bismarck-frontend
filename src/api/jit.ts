@@ -25,6 +25,11 @@ function toJitSession(raw: Record<string, unknown>): JitSession {
     remainingSeconds: Math.max(0, num(raw.remainingSeconds)),
     provisioningStatus: raw.provisioningStatus ? String(raw.provisioningStatus) : null,
     provisioningDetail: raw.provisioningDetail ? String(raw.provisioningDetail) : null,
+    targetVmName: raw.targetVmName ? String(raw.targetVmName) : null,
+    targetHost: raw.targetHost ? String(raw.targetHost) : null,
+    targetOsType: raw.targetOsType ? String(raw.targetOsType) : null,
+    connectionCommand: raw.connectionCommand ? String(raw.connectionCommand) : null,
+    targetResourceGroup: raw.targetResourceGroup ? String(raw.targetResourceGroup) : null,
   };
 }
 

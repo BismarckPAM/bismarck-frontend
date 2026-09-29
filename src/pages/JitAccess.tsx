@@ -94,6 +94,24 @@ export const JitAccess: React.FC = () => {
 
   const active = sessions.filter((session) => session.status === 'ACTIVE');
   const history = sessions.filter((session) => session.status !== 'ACTIVE');
+  const connectable = active.filter((session) => Boolean(session.connectionCommand));
+
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyCommand = async (session: JitSession) => {
+    if (!session.connectionCommand) return;
+    try {
+      await navigator.clipboard.writeText(session.connectionCommand);
+      setCopiedId(session.id);
+      window.setTimeout(
+        () => setCopiedId((current) => (current === session.id ? null : current)),
+        2000,
+      );
+    } catch {
+      // Clipboard can be blocked (insecure context / permissions). The command
+      // is still visible on screen, so this is not worth surfacing as an error.
+    }
+  };
 
   const remainingLabel = (session: JitSession): string => {
     if (session.status !== 'ACTIVE') return '—';
@@ -202,6 +220,44 @@ export const JitAccess: React.FC = () => {
             <tbody>{active.map(renderRow)}</tbody>
           </table>
         </div>
+      )}
+
+      {connectable.length > 0 && (
+        <>
+          <h2 className="panel-title">Connect to your granted machines</h2>
+          <p className="wf-hint">
+            These commands work only while the session is <strong>ACTIVE</strong>. Access is
+            authorised by an Azure role assignment that is removed automatically when the timer
+            reaches zero, or when an administrator revokes it.
+          </p>
+          {connectable.map((session) => (
+            <div key={session.id} className="wf-connect-card">
+              <div className="wf-connect-head">
+                <div>
+                  <strong>{session.resourceName || session.targetVmName || 'Machine'}</strong>
+                  {session.targetVmName && (
+                    <span className="wf-hint"> ({session.targetVmName})</span>
+                  )}
+                </div>
+                <span className="wf-hint">{session.targetOsType || 'Linux'}</span>
+              </div>
+              <div className="wf-connect-command">
+                <code>{session.connectionCommand}</code>
+                <button
+                  type="button"
+                  className="secondary-action-btn"
+                  onClick={() => void copyCommand(session)}
+                >
+                  {copiedId === session.id ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <div className="wf-hint">
+                Expires in {remainingLabel(session)}
+                {session.provisioningStatus && ` · Provisioning: ${session.provisioningStatus}`}
+              </div>
+            </div>
+          ))}
+        </>
       )}
 
       {history.length > 0 && (

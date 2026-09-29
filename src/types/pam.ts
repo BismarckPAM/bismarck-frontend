@@ -143,6 +143,17 @@ export interface JitSession {
   remainingSeconds: number;
   provisioningStatus?: string | null;
   provisioningDetail?: string | null;
+  /**
+   * Azure VM targeting, resolved from the Resource catalog when the session was
+   * created. Null for non-VM resources. `connectionCommand` is the exact command
+   * the user should run - it only works while the session is ACTIVE, because the
+   * "Virtual Machine User Login" role assignment exists for that window only.
+   */
+  targetVmName?: string | null;
+  targetHost?: string | null;
+  targetOsType?: string | null;
+  connectionCommand?: string | null;
+  targetResourceGroup?: string | null;
 }
 
 export type OnboardingTicketStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
