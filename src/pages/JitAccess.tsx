@@ -5,11 +5,7 @@ import { canRevokePermissions } from '../auth/roles';
 import { listJitSessions, revokeTemporaryPermission } from '../api/jit';
 import { isApiError } from '../api/errors';
 import { Modal } from '../components/common/Modal';
-import {
-  EmptyState,
-  LoadingState,
-  UnsupportedNotice,
-} from '../components/common/StateViews';
+import { EmptyState, LoadingState, UnsupportedNotice } from '../components/common/StateViews';
 import useResources from '../hooks/useResources';
 import { formatDateTime, levelLabel } from '../utils/format';
 import { capabilities } from '../api/config';
@@ -69,6 +65,8 @@ export const JitAccess: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Initial fetch of the authoritative session list.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 

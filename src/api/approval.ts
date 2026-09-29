@@ -70,9 +70,7 @@ export async function listPendingApprovalRequests(): Promise<ApprovalRequest[]> 
  */
 export async function getMyRequests(): Promise<MyRequestsResponse> {
   return withNormalizedError(async () => {
-    const { data } = await identityClient.get<Record<string, unknown>>(
-      '/api/approval/requests/me',
-    );
+    const { data } = await identityClient.get<Record<string, unknown>>('/api/approval/requests/me');
 
     const rawItems = Array.isArray(data?.items) ? (data.items as Record<string, unknown>[]) : [];
     const rawCounters = (data?.counters ?? {}) as Record<string, unknown>;

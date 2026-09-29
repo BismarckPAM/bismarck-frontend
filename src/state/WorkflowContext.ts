@@ -1,9 +1,5 @@
 import { createContext, useContext } from 'react';
-import type {
-  ApprovalRequest,
-  NotificationItem,
-  RequestCounters,
-} from '../types/pam';
+import type { ApprovalRequest, NotificationItem, RequestCounters } from '../types/pam';
 
 /**
  * Cross-screen workflow state.

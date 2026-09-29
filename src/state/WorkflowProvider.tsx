@@ -92,6 +92,10 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Load the request history once per session (and whenever auth changes).
   useEffect(() => {
     if (!isAuthenticated) return;
+
+    // Initial fetch from the server; the result arrives asynchronously and
+    // populates the already-rendered table.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshMyRequests();
   }, [isAuthenticated, refreshMyRequests]);
 

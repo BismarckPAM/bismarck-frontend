@@ -50,7 +50,7 @@ const revokedSession: JitSession = {
   provisioningStatus: 'REVOKED',
 };
 
-const emptyValue: WorkflowContextValue = ({
+const emptyValue: WorkflowContextValue = {
   myRequests: [],
   myRequestCounters: { total: 0, pending: 0, approved: 0, rejected: 0 },
   myRequestsLoading: false,
@@ -65,7 +65,7 @@ const emptyValue: WorkflowContextValue = ({
   viewedIds: [],
   markViewed: vi.fn(),
   refreshNotifications: vi.fn().mockResolvedValue(undefined),
-}) satisfies WorkflowContextValue;
+} satisfies WorkflowContextValue;
 
 const seedAuth = (role: string) => {
   localStorage.setItem(TOKEN_KEY, 'token');

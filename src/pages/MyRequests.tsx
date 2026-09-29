@@ -70,10 +70,7 @@ export const MyRequests: React.FC = () => {
       {myRequestsLoading && myRequests.length === 0 ? (
         <LoadingState message="Loading your requests…" />
       ) : myRequests.length === 0 ? (
-        <EmptyState
-          title="No requests yet"
-          message="You have not submitted any access requests."
-        />
+        <EmptyState title="No requests yet" message="You have not submitted any access requests." />
       ) : (
         <>
           <div className="table-toolbar">
