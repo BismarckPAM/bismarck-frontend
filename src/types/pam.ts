@@ -118,6 +118,33 @@ export interface JitRevokeResult {
   revokedAt?: string;
 }
 
+/**
+ * JitSessionResponse — GET /api/jit/sessions (Authorization Service).
+ *
+ * A real Just-In-Time session: a `TemporaryPermission` row created by the
+ * `approval-granted` Kafka event. `remainingSeconds` is the live TTL countdown
+ * and `provisioningStatus` reports whether the cloud (Azure ARM) grant actually
+ * happened (`ACTIVE`) or the session is local-only (`LOCAL_ONLY`).
+ */
+export interface JitSession {
+  id: string;
+  approvalId: string;
+  userId: string;
+  userEmail?: string | null;
+  resourceId: string;
+  resourceName?: string | null;
+  action?: string | null;
+  requestedLevel: number;
+  status: JitStatus;
+  grantedAt: string;
+  expiresAt: string;
+  revokedAt?: string | null;
+  revokedByUserId?: string | null;
+  remainingSeconds: number;
+  provisioningStatus?: string | null;
+  provisioningDetail?: string | null;
+}
+
 export type OnboardingTicketStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 /**
