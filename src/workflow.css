@@ -639,6 +639,225 @@
    only possible while the session is ACTIVE, because the "Virtual Machine User
    Login" role assignment exists for that window only. */
 
+/* ==========================================================================
+   Access Analytics (BIS-404)
+   ==========================================================================
+   Everything here reuses the existing Bismarck tokens (--accent-brand,
+   --accent-emerald, --accent-rose, --accent-info, --text-muted, --radius-*)
+   and the existing .dashboard-panel / .metric-card / .skeleton-* primitives,
+   so the analytics section reads as part of the same console rather than a
+   bolted-on BI widget. No new design system, no global resets. */
+
+.analytics-section {
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.analytics-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.analytics-section-head .panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analytics-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---- Toolbar / date range ---- */
+
+.analytics-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(113, 0, 95, 0.12);
+  background: rgba(113, 0, 95, 0.03);
+}
+
+.analytics-date-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.analytics-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.analytics-date-field label {
+  color: var(--text-secondary, #6f5b6d);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.analytics-date-input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(113, 0, 95, 0.18);
+  background: #ffffff;
+  color: var(--text-primary, #2b1626);
+  font-family: inherit;
+  font-size: 0.875rem;
+  min-height: 38px;
+}
+
+.analytics-date-input:focus {
+  outline: none;
+  border-color: var(--accent-brand, #71005f);
+  box-shadow: 0 0 0 3px rgba(113, 0, 95, 0.12);
+}
+
+.analytics-validation {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #b42318;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ---- Metric cards ---- */
+
+.analytics-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analytics-metrics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.analytics-metrics-grid .metric-card {
+  gap: 4px;
+  padding: 14px 16px;
+}
+
+/* ---- Charts ----
+   `minmax(0, 1fr)` is deliberate: it stops a long resource name from
+   forcing the grid track wider than its container, which is what would
+   otherwise push a horizontal scrollbar onto the page. */
+
+.analytics-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 18px;
+}
+
+.analytics-chart-card {
+  gap: 12px;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.analytics-chart-large {
+  grid-column: 1 / -1;
+}
+
+/* ResponsiveContainer needs an explicitly sized parent. The heights are
+   declared here rather than inline so the chart boxes cannot be collapsed
+   to 0 by a missing stylesheet. */
+.analytics-chart-container {
+  width: 100%;
+  min-width: 0;
+  height: 260px;
+}
+
+.analytics-chart-tall {
+  height: 320px;
+}
+
+.analytics-chart-doughnut {
+  height: 240px;
+}
+
+/* Visible legend table under the doughnut, so the split is readable without
+   relying on slice colours. */
+.analytics-legend-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.analytics-legend-table th,
+.analytics-legend-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(113, 0, 95, 0.1);
+}
+
+.analytics-legend-table thead th {
+  color: var(--text-muted, #99899b);
+  font-weight: 600;
+}
+
+/* Text equivalent of each plot. Present for screen readers and for anyone
+   who cannot use the SVG; visually hidden so it does not duplicate the chart. */
+.analytics-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Loading skeleton ---- */
+
+.analytics-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.analytics-skeleton .dashboard-panel {
+  min-height: 120px;
+  animation: pulseSkeleton 1.5s ease-in-out infinite;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .analytics-toolbar {
+    align-items: stretch;
+  }
+
+  .analytics-date-controls {
+    align-items: stretch;
+  }
+
+  .analytics-date-field {
+    flex: 1 1 150px;
+  }
+
+  .analytics-chart-container,
+  .analytics-chart-tall,
+  .analytics-chart-doughnut {
+    height: 240px;
+  }
+}
+
 .wf-connect-card {
   display: flex;
   flex-direction: column;
