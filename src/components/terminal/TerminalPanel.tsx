@@ -2,7 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
-import { openJitTerminal, isTerminalSupported, type TerminalConnection } from '../../api/jitTerminal';
+import {
+  openJitTerminal,
+  isTerminalSupported,
+  type TerminalConnection,
+} from '../../api/jitTerminal';
 
 export interface TerminalPanelProps {
   /** The `TemporaryPermission` id — this is the session the broker is bound to. */
@@ -14,7 +18,11 @@ export interface TerminalPanelProps {
 }
 
 /** Fits the PTY to its container and reports the new geometry upstream. */
-function useFitter(termRef: React.RefObject<Terminal | null>, fitRef: React.RefObject<FitAddon | null>, connectionRef: React.MutableRefObject<TerminalConnection | null>) {
+function useFitter(
+  termRef: React.RefObject<Terminal | null>,
+  fitRef: React.RefObject<FitAddon | null>,
+  connectionRef: React.MutableRefObject<TerminalConnection | null>,
+) {
   return useCallback(() => {
     const term = termRef.current;
     const fit = fitRef.current;
@@ -37,11 +45,7 @@ function useFitter(termRef: React.RefObject<Terminal | null>, fitRef: React.RefO
  * the SSH channel down, the socket closes, and the shell dies with it — the user
  * cannot outlive their grant.
  */
-export const TerminalPanel: React.FC<TerminalPanelProps> = ({
-  permissionId,
-  login,
-  label,
-}) => {
+export const TerminalPanel: React.FC<TerminalPanelProps> = ({ permissionId, login, label }) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitRef = useRef<FitAddon | null>(null);
