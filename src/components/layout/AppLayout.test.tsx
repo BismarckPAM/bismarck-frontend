@@ -97,4 +97,45 @@ describe('AppLayout Component & Navigation Shell', () => {
     // Token must be cleared from storage
     expect(localStorage.getItem(TOKEN_KEY)).toBeNull();
   });
+
+  // --- BIS-405: Admin Dashboard navigation is role-gated in the shell ---------
+  const seedRole = (role: string) => {
+    seedAuthSession();
+    localStorage.setItem(
+      'bismarck_pam_user',
+      JSON.stringify({
+        id: 'usr-999',
+        fullName: 'Sarah Connor',
+        email: 'sarah.c@bismarck.sec',
+        role,
+        department: 'Cyber Defense',
+      }),
+    );
+  };
+
+  it('offers the Admin Dashboard link to an Admin', async () => {
+    seedRole('Admin');
+    renderAppWithLayout(['/users']);
+
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: /admin dashboard/i })).toBeInTheDocument(),
+    );
+  });
+
+  it('offers the Admin Dashboard link to a Security Admin', async () => {
+    seedRole('Security Admin');
+    renderAppWithLayout(['/users']);
+
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: /admin dashboard/i })).toBeInTheDocument(),
+    );
+  });
+
+  it('hides the Admin Dashboard link from an ordinary user', async () => {
+    seedRole('Developer');
+    renderAppWithLayout(['/users']);
+
+    await waitFor(() => expect(screen.getByTestId('users-content')).toBeInTheDocument());
+    expect(screen.queryByRole('link', { name: /admin dashboard/i })).toBeNull();
+  });
 });
