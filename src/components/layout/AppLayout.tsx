@@ -17,10 +17,11 @@ import {
   Bell,
   Menu,
   X,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import NotificationBell from '../notifications/NotificationBell';
-import { isApprover, canViewAudit, isAdmin } from '../../auth/roles';
+import { isApprover, canViewAudit, isAdmin, isAdminOrSecurityAdmin } from '../../auth/roles';
 import { BismarckMark } from '../../features/landing/Logo';
 
 interface NavItemConfig {
@@ -44,6 +45,7 @@ export const AppLayout: React.FC = () => {
   const approver = isApprover(user);
   const auditVisible = canViewAudit(user);
   const adminVisible = isAdmin(user);
+  const adminDashboardVisible = isAdminOrSecurityAdmin(user);
 
   // Close the off-canvas sidebar whenever the route changes
   // (state adjusted during render — React's recommended pattern).
@@ -108,6 +110,19 @@ export const AppLayout: React.FC = () => {
     {
       label: 'Administration',
       items: [
+        // BIS-405. Visible to Admin AND Security Admin only — an ordinary user
+        // must not even be offered the link. The /admin/* route tree is guarded
+        // independently, so hiding this is usability, not the security boundary.
+        ...(adminDashboardVisible
+          ? [
+              {
+                to: '/admin/users',
+                icon: ShieldCheck,
+                label: 'Admin Dashboard',
+                aria: 'Admin Dashboard',
+              },
+            ]
+          : []),
         { to: '/users', icon: Users, label: 'Identities & Users', aria: 'Identities and Users' },
         {
           to: '/resources',
