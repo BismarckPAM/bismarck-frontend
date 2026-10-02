@@ -13,6 +13,7 @@ vi.mock('../api/resources', () => ({
 
 const revoke = vi.fn();
 const listJit = vi.fn().mockResolvedValue([]);
+const terminalStatus = vi.fn().mockResolvedValue(null);
 
 vi.mock('../api/jit', () => ({
   listJitSessions: (activeOnly?: boolean) => listJit(activeOnly),
@@ -120,6 +121,10 @@ describe('JIT Access', () => {
     revoke.mockReset();
     listJit.mockReset();
     listJit.mockResolvedValue([]);
+    // Without the reset a test that stubs the probe would leak its value into
+    // every later test in this file.
+    terminalStatus.mockReset();
+    terminalStatus.mockResolvedValue(null);
   });
 
   it('loads sessions from the Authorization Service rather than from approval requests', async () => {
@@ -222,5 +227,51 @@ describe('JIT Access', () => {
 
     expect(await screen.findByText(/Expired & revoked sessions/i)).toBeInTheDocument();
     expect(screen.queryByText(/Connect to your granted machines/i)).not.toBeInTheDocument();
+  });
+
+  it('offers the brokered terminal for an active Linux VM session', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([vmSession]);
+    terminalStatus.mockResolvedValue({
+      permissionId: vmSession.id,
+      brokerConfigured: true,
+      login: 'alex@company.com',
+      keyAvailable: true,
+      unavailableReason: null,
+    });
+    renderJit();
+
+    expect(await screen.findByRole('button', { name: /open terminal/i })).toBeInTheDocument();
+  });
+
+  it('explains the missing SSH key instead of opening a dead terminal', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([vmSession]);
+    terminalStatus.mockResolvedValue({
+      permissionId: vmSession.id,
+      brokerConfigured: true,
+      login: 'alex@company.com',
+      keyAvailable: false,
+      unavailableReason: "No SSH private key is configured for login 'alex@company.com'.",
+    });
+    const user = userEvent.setup();
+    renderJit();
+
+    await user.click(await screen.findByRole('button', { name: /open terminal/i }));
+
+    // The reason must name the account, so an operator knows which key to add.
+    expect(
+      await screen.findByText(/No SSH private key is configured for login 'alex@company.com'/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText(/terminal session/i)).not.toBeInTheDocument();
+  });
+
+  it('does not offer the terminal for a Windows target, which needs RDP', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([{ ...vmSession, targetOsType: 'Windows' }]);
+    renderJit();
+
+    await screen.findByText(/Connect to your granted machines/i);
+    expect(screen.queryByRole('button', { name: /open terminal/i })).not.toBeInTheDocument();
   });
 });
