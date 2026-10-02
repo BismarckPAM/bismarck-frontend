@@ -155,6 +155,27 @@
   font-size: 0.85rem;
 }
 
+/* ---- Audit Log filters (BIS-403) ---- */
+/* Wraps the search row and the six exact-match filter controls. The controls
+   reuse the existing .filter-controls-group / .role-filter-select styles; this
+   block only adds the vertical rhythm between the two rows. */
+.audit-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.audit-filters .table-toolbar {
+  margin-bottom: 0;
+}
+
+.audit-filter-hint {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
 /* ---- Data tables ---- */
 .table-responsive-wrapper {
   width: 100%;
