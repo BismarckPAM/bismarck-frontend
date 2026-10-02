@@ -18,6 +18,21 @@ vi.mock('../api/jit', () => ({
   listJitSessions: (activeOnly?: boolean) => listJit(activeOnly),
   revokeTemporaryPermission: (id: string) => revoke(id),
 }));
+// Only the status probe is exercised here: it decides whether the terminal is
+// offered at all. The xterm view is replaced with a stub because jsdom has no
+// canvas/layout, so a real Terminal cannot measure itself.
+vi.mock('../api/jitTerminal', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../api/jitTerminal')>();
+  return {
+    ...actual,
+    getJitTerminalStatus: (id: string, email?: string | null) => terminalStatus(id, email),
+  };
+});
+vi.mock('../components/terminal/TerminalPanel', () => ({
+  default: ({ login }: { login?: string | null }) => (
+    <div aria-label="Terminal session">{login}</div>
+  ),
+}));
 
 const future = (minutes: number) => new Date(Date.now() + minutes * 60_000).toISOString();
 

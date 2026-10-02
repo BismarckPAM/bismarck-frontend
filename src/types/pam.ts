@@ -110,6 +110,21 @@ export interface AuditQuery {
   pageSize?: number;
 }
 
+/**
+ * GET /api/jit/terminal/{id}/status (Authorization Service).
+ *
+ * Lets the UI decide whether to offer the terminal BEFORE the user clicks, and
+ * explains the exact missing secret when it cannot be offered. `login` is the
+ * SSH account the broker will actually log in as.
+ */
+export interface JitTerminalStatus {
+  permissionId: string;
+  brokerConfigured: boolean;
+  login?: string | null;
+  keyAvailable: boolean;
+  unavailableReason?: string | null;
+}
+
 /** Response of POST /api/authorization/permissions/{id}/revoke. */
 export interface JitRevokeResult {
   message: string;
@@ -222,4 +237,6 @@ export interface BackendCapabilities {
   jitList: boolean;
   jitRequest: boolean;
   jitRevoke: boolean;
+  /** Brokered in-browser terminal over the JIT session's WebSocket. */
+  jitTerminal: boolean;
 }
