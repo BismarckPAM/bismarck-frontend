@@ -41,6 +41,11 @@ const baselineCapabilities: BackendCapabilities = {
   jitList: true,
   jitRequest: false,
   jitRevoke: true,
+  // The brokered terminal exists server-side (GET /api/jit/terminal/{id}/status
+  // plus the WebSocket at /api/jit/terminal/{id}). The button is additionally
+  // gated on that status probe, so it only appears when the Authorization
+  // Service actually holds a key for the session's login.
+  jitTerminal: true,
 };
 
 function readOverrides(): Partial<BackendCapabilities> {

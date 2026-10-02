@@ -427,6 +427,12 @@
   box-shadow: 0 24px 60px -12px rgba(45, 18, 41, 0.25);
 }
 
+/* The brokered terminal needs real width to be usable; a 640px shell forces
+   constant wrapping. Applied by the JIT screen via the modal's title hook. */
+.wf-modal:has(.wf-terminal) {
+  max-width: 1100px;
+}
+
 .wf-modal-header {
   display: flex;
   justify-content: space-between;
@@ -650,4 +656,86 @@
   font-size: 0.85rem;
   overflow-x: auto;
   white-space: pre;
+}
+
+/* ---- Brokered JIT terminal ---- */
+.wf-terminal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wf-terminal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wf-terminal-title {
+  font-weight: 600;
+}
+
+.wf-terminal-login {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--wf-surface-muted, #f7f9fc);
+  border: 1px solid var(--wf-border, #d7dce5);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.wf-terminal-state {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.wf-terminal-state-open {
+  color: #1a7f47;
+}
+
+.wf-terminal-state-connecting {
+  color: #9a6a00;
+}
+
+.wf-terminal-state-closed {
+  color: #b3261e;
+}
+
+.wf-terminal-status {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--wf-surface-muted, #f7f9fc);
+  border: 1px solid var(--wf-border, #d7dce5);
+  font-size: 0.85rem;
+}
+
+/* The xterm host must have a real height or fit() computes 0x0 and the shell
+   renders as a single squashed line. Fixed vh units keep it predictable. */
+.wf-terminal-screen {
+  height: 58vh;
+  min-height: 320px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #10182a;
+  overflow: hidden;
+  cursor: text;
+}
+
+.wf-terminal-screen .xterm {
+  height: 100%;
+}
+
+/* Inside the terminal the surface is dark, so force light-on-dark regardless
+   of the page theme. */
+.wf-terminal-screen .xterm-viewport {
+  background-color: #10182a !important;
+}
+
+/* The terminal needs more room than the default modal. */
+.wf-terminal-screen:focus-within {
+  outline: 2px solid var(--wf-accent, #2f6feb);
+  outline-offset: 2px;
 }

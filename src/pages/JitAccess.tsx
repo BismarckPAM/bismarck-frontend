@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ShieldOff, RefreshCw } from 'lucide-react';
+import React, { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { ShieldOff, RefreshCw, Terminal as TerminalIcon } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { canRevokePermissions } from '../auth/roles';
 import { listJitSessions, revokeTemporaryPermission } from '../api/jit';
+import { getJitTerminalStatus, isTerminalSupported } from '../api/jitTerminal';
 import { isApiError } from '../api/errors';
 import { Modal } from '../components/common/Modal';
 import { EmptyState, LoadingState, UnsupportedNotice } from '../components/common/StateViews';
@@ -10,6 +11,11 @@ import useResources from '../hooks/useResources';
 import { formatDateTime, levelLabel } from '../utils/format';
 import { capabilities } from '../api/config';
 import type { ApiError, JitSession } from '../types/pam';
+
+// xterm.js is a large dependency and only needed once a terminal is actually
+// opened, so it is split out of the main bundle rather than shipped to every
+// page load.
+const TerminalPanel = lazy(() => import('../components/terminal/TerminalPanel'));
 
 /**
  * Just-In-Time access.
@@ -40,6 +46,12 @@ export const JitAccess: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
 
+  // ---- Brokered terminal ------------------------------------------------
+  // Which session's terminal is open, and why a session cannot offer one.
+  const [terminalFor, setTerminalFor] = useState<JitSession | null>(null);
+  const [terminalLogin, setTerminalLogin] = useState<string | null>(null);
+  const [terminalBlockReason, setTerminalBlockReason] = useState<string | null>(null);
+
   // Local ticking clock so the countdown updates without hammering the API.
   // The authoritative values come from the server on each load.
   const [now, setNow] = useState(() => Date.now());
@@ -69,6 +81,54 @@ export const JitAccess: React.FC = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
+
+  /**
+   * Opens the brokered terminal for a session.
+   *
+   * The status probe runs first so the user is told which secret is missing
+   * ("no key configured for user@x.com") instead of clicking through to a dead
+   * terminal. A failure to probe is treated as "unavailable", never as a reason
+   * to open a socket that cannot succeed.
+   */
+  const openTerminal = async (session: JitSession) => {
+    setTerminalBlockReason(null);
+    setTerminalLogin(null);
+
+    if (!isTerminalSupported()) {
+      setTerminalBlockReason('This browser does not support WebSockets.');
+      setTerminalFor(session);
+      return;
+    }
+
+    try {
+      const status = await getJitTerminalStatus(session.id, session.userEmail);
+      const login = status?.login ?? session.userEmail ?? null;
+
+      if (!status?.brokerConfigured || !status?.keyAvailable) {
+        setTerminalLogin(login);
+        setTerminalBlockReason(
+          status?.unavailableReason
+            || 'The brokered terminal is not available for this session.',
+        );
+        setTerminalFor(session);
+        return;
+      }
+
+      setTerminalLogin(login);
+      setTerminalFor(session);
+    } catch {
+      setTerminalBlockReason(
+        'Could not reach the terminal service. Check your connection and try again.',
+      );
+      setTerminalFor(session);
+    }
+  };
+
+  const closeTerminal = () => {
+    setTerminalFor(null);
+    setTerminalLogin(null);
+    setTerminalBlockReason(null);
+  };
 
   const handleRevoke = async () => {
     if (!revokeId) return;
@@ -250,6 +310,20 @@ export const JitAccess: React.FC = () => {
                 >
                   {copiedId === session.id ? 'Copied' : 'Copy'}
                 </button>
+                {/* Only Linux targets get the in-browser terminal: the broker
+                    speaks SSH, and a Windows VM needs RDP. */}
+                {capabilities.jitTerminal &&
+                isTerminalSupported() &&
+                (session.targetOsType || 'Linux').toLowerCase().startsWith('linux') ? (
+                  <button
+                    type="button"
+                    className="primary-action-btn"
+                    onClick={() => void openTerminal(session)}
+                  >
+                    <TerminalIcon size={16} aria-hidden="true" />
+                    <span>Open terminal</span>
+                  </button>
+                ) : null}
               </div>
               <div className="wf-hint">
                 Expires in {remainingLabel(session)}
@@ -279,6 +353,61 @@ export const JitAccess: React.FC = () => {
             </table>
           </div>
         </>
+      )}
+
+      {terminalFor && (
+        <Modal
+          title={`Terminal · ${terminalFor.resourceName || terminalFor.targetVmName || 'Machine'}`}
+          onClose={closeTerminal}
+          footer={
+            <button type="button" className="secondary-action-btn" onClick={closeTerminal}>
+              Close
+            </button>
+          }
+        >
+          {terminalBlockReason ? (
+            <>
+              <div className="wf-error" role="alert">
+                {terminalBlockReason}
+              </div>
+              <p className="wf-hint">
+                The brokered terminal runs on the Authorization Service, which holds the SSH key.
+                {terminalLogin && (
+                  <>
+                    {' '}
+                    It would connect as <code>{terminalLogin}</code>.
+                  </>
+                )}{' '}
+                An administrator can supply the missing key and retry.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="wf-hint">
+                This shell is brokered by the server and dies automatically when the JIT session
+                expires or is revoked.
+                {terminalLogin && (
+                  <>
+                    {' '}
+                    Connected as <code>{terminalLogin}</code>.
+                  </>
+                )}
+              </p>
+              {/* Keyed on the id so switching sessions rebuilds the xterm instance
+                  rather than reusing a disposed one. */}
+              <Suspense
+                fallback={<LoadingState message="Loading terminal…" />}
+              >
+                <TerminalPanel
+                  key={terminalFor.id}
+                  permissionId={terminalFor.id}
+                  login={terminalLogin}
+                  label={terminalFor.targetVmName || terminalFor.resourceName || undefined}
+                />
+              </Suspense>
+            </>
+          )}
+        </Modal>
       )}
 
       {revokeId && (
