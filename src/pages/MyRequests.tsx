@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Search, Eye, Info } from 'lucide-react';
+import { Search, Eye, Info, RefreshCw } from 'lucide-react';
 import { useWorkflow } from '../state/WorkflowContext';
 import { useAuth } from '../context/useAuth';
 import useResources from '../hooks/useResources';
 import { ApprovalStatusBadge } from '../components/common/StatusBadge';
-import { EmptyState, UnsupportedNotice } from '../components/common/StateViews';
+import { EmptyState, LoadingState } from '../components/common/StateViews';
 import { RequestDetails } from '../components/requests/RequestDetails';
 import { Modal } from '../components/common/Modal';
 import { formatDateTime, formatDuration, levelLabel } from '../utils/format';
@@ -13,7 +13,7 @@ import type { ApprovalRequest, ApprovalStatus } from '../types/pam';
 type SortKey = 'newest' | 'oldest' | 'status';
 
 export const MyRequests: React.FC = () => {
-  const { myRequests } = useWorkflow();
+  const { myRequests, myRequestsLoading, myRequestsError, refreshMyRequests } = useWorkflow();
   const { user } = useAuth();
   const { resourceName } = useResources();
 
@@ -47,18 +47,30 @@ export const MyRequests: React.FC = () => {
         <div>
           <h1 className="page-title">My Requests</h1>
           <p className="page-description">
-            Access requests submitted by {user?.fullName || 'you'} in this session.
+            Access requests submitted by {user?.fullName || 'you'}.
           </p>
         </div>
+        <button
+          type="button"
+          className="secondary-action-btn"
+          onClick={() => void refreshMyRequests()}
+          disabled={myRequestsLoading}
+        >
+          <RefreshCw size={16} aria-hidden="true" />
+          <span>{myRequestsLoading ? 'Refreshing…' : 'Refresh'}</span>
+        </button>
       </div>
 
-      <UnsupportedNotice message="The backend has no 'list my own requests' endpoint (GET /api/approval/requests returns the approver-only pending queue). This view lists requests you submitted during this session." />
+      {myRequestsError && (
+        <div className="wf-error" role="alert">
+          {myRequestsError}
+        </div>
+      )}
 
-      {myRequests.length === 0 ? (
-        <EmptyState
-          title="No requests yet"
-          message="You have not submitted any access requests in this session."
-        />
+      {myRequestsLoading && myRequests.length === 0 ? (
+        <LoadingState message="Loading your requests…" />
+      ) : myRequests.length === 0 ? (
+        <EmptyState title="No requests yet" message="You have not submitted any access requests." />
       ) : (
         <>
           <div className="table-toolbar">

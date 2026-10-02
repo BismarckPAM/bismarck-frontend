@@ -5,6 +5,7 @@ import { WorkflowProvider } from './state/WorkflowProvider';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RequireRole from './components/auth/RequireRole';
 import AppLayout from './components/layout/AppLayout';
+import LandingPage from './features/landing/LandingPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import RequestAccess from './pages/RequestAccess';
@@ -17,8 +18,9 @@ import Users from './pages/Users';
 import Resources from './pages/Resources';
 import Policies from './pages/Policies';
 import AccessCheck from './pages/AccessCheck';
+import Onboarding from './pages/Onboarding';
 import NotFound from './pages/NotFound';
-import { isApprover, canViewAudit } from './auth/roles';
+import { isApprover, canViewAudit, isAdmin } from './auth/roles';
 
 export const App: React.FC = () => {
   return (
@@ -26,6 +28,8 @@ export const App: React.FC = () => {
       <AuthProvider>
         <WorkflowProvider>
           <Routes>
+            {/* Public Marketing Landing */}
+            <Route path="/" element={<LandingPage />} />
             {/* Public Auth Route */}
             <Route path="/login" element={<Login />} />
 
@@ -60,6 +64,14 @@ export const App: React.FC = () => {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/access-check" element={<AccessCheck />} />
+                <Route
+                  path="/onboarding"
+                  element={
+                    <RequireRole allowed={isAdmin}>
+                      <Onboarding />
+                    </RequireRole>
+                  }
+                />
               </Route>
             </Route>
 
