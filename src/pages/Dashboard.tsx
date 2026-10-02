@@ -7,6 +7,7 @@ import { isApprover, canViewAudit } from '../auth/roles';
 import { listPendingApprovalRequests } from '../api/approval';
 import { isApiError } from '../api/errors';
 import { LoadingState, EmptyState, UnsupportedNotice } from '../components/common/StateViews';
+import AnalyticsDashboard from '../components/analytics/AnalyticsDashboard';
 import { formatDateTime, timeAgo } from '../utils/format';
 import { capabilities } from '../api/config';
 import type { ApprovalRequest } from '../types/pam';
@@ -63,7 +64,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <UnsupportedNotice message="Counters below reflect requests submitted during this browser session: the backend exposes no 'my requests' or JIT 'list' endpoints, so a full server-side history is not available." />
+      <UnsupportedNotice message="The personal request counters below reflect requests submitted during this browser session: the backend exposes no 'my requests' or JIT 'list' endpoints, so a full server-side history is not available. The Access Analytics section further down is different: it is real server-side data reported by the Analytics Service." />
 
       <div className="metrics-grid">
         <article className="metric-card">
@@ -102,6 +103,14 @@ export const Dashboard: React.FC = () => {
           <span className="metric-label">Unread notifications</span>
         </article>
       </div>
+      {/*
+        BIS-404: platform-wide access analytics. Gated on the same existing
+        permission as the Audit Log (`canViewAudit`, i.e. Admin / Manager), which
+        matches the security-sensitive nature of the Analytics endpoints. The
+        Role/RBAC overhaul for this area is BIS-405 and is deliberately not
+        attempted here.
+      */}
+      {canViewAudit(user) && <AnalyticsDashboard />}
 
       <div className="dashboard-grid">
         <div className="dashboard-panel">
