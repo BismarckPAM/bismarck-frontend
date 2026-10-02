@@ -12,8 +12,25 @@ vi.mock('../api/resources', () => ({
 }));
 
 const revoke = vi.fn();
+const listJit = vi.fn().mockResolvedValue([]);
+
 vi.mock('../api/jit', () => ({
   revokeTemporaryPermission: (id: string) => revoke(id),
+}));
+// Only the status probe is exercised here: it decides whether the terminal is
+// offered at all. The xterm view is replaced with a stub because jsdom has no
+// canvas/layout, so a real Terminal cannot measure itself.
+vi.mock('../api/jitTerminal', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../api/jitTerminal')>();
+  return {
+    ...actual,
+    getJitTerminalStatus: (id: string, email?: string | null) => terminalStatus(id, email),
+  };
+});
+vi.mock('../components/terminal/TerminalPanel', () => ({
+  default: ({ login }: { login?: string | null }) => (
+    <div aria-label="Terminal session">{login}</div>
+  ),
 }));
 
 const approvedRequest: ApprovalRequest = {
@@ -63,6 +80,8 @@ describe('JIT Access', () => {
   beforeEach(() => {
     localStorage.clear();
     revoke.mockReset();
+    listJit.mockReset();
+    listJit.mockResolvedValue([]);
   });
 
   it('shows an empty state when there are no approved requests', async () => {
@@ -109,5 +128,41 @@ describe('JIT Access', () => {
 
     const errors = await screen.findAllByText(/Already expired/i);
     expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('surfaces a load failure without crashing the page', async () => {
+    seedAuth('Admin');
+    listJit.mockRejectedValue({ kind: 'network', message: 'Unable to reach the server.' });
+    renderJit();
+
+    expect(await screen.findByText(/Unable to reach the server\./i)).toBeInTheDocument();
+  });
+
+  it('shows the connect command for an active VM session', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([vmSession]);
+    renderJit();
+
+    expect(await screen.findByText(/Connect to your granted machines/i)).toBeInTheDocument();
+    expect(screen.getByText('ssh alex@20.51.0.4')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /copy/i })).toBeInTheDocument();
+  });
+
+  it('does not show a connect command for a non-VM session', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([activeSession]);
+    renderJit();
+
+    await screen.findByText('Prod DB');
+    expect(screen.queryByText(/Connect to your granted machines/i)).not.toBeInTheDocument();
+  });
+
+  it('hides the connect command once the session is no longer active', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([{ ...vmSession, status: 'EXPIRED' }]);
+    renderJit();
+
+    expect(await screen.findByText(/Expired & revoked sessions/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Connect to your granted machines/i)).not.toBeInTheDocument();
   });
 });
