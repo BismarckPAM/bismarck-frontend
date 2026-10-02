@@ -107,12 +107,7 @@ export const ApprovalQueue: React.FC = () => {
       <div className="page-header-row">
         <div>
           <h1 className="page-title">Approval Queue</h1>
-          <p className="page-description">
-            Pending access requests awaiting a decision. Endpoints:
-            <code> GET /api/approval/requests</code>,{' '}
-            <code>POST /api/approval/requests/{'{id}'}/approve</code>,{' '}
-            <code>POST /api/approval/requests/{'{id}'}/reject</code>.
-          </p>
+          <p className="page-description">Pending access requests awaiting a decision.</p>
         </div>
         <button type="button" className="secondary-action-btn" onClick={() => void load()}>
           <RefreshCw size={16} aria-hidden="true" />

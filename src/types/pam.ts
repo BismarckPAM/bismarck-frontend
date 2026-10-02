@@ -54,6 +54,28 @@ export interface RejectApprovalRequest {
   reason: string;
 }
 
+/**
+ * Aggregate counters returned alongside the caller's own request history.
+ * Mirrors the backend `RequestCounters` record.
+ */
+export interface RequestCounters {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
+/**
+ * MyRequestsResponse — GET /api/approval/requests/me.
+ *
+ * Server-side history for the authenticated user, so it survives page reloads
+ * and new browser sessions (unlike client-session-only tracking).
+ */
+export interface MyRequestsResponse {
+  items: ApprovalRequest[];
+  counters: RequestCounters;
+}
+
 /** NotificationResponseDto — GET /api/notifications/{userId}. */
 export interface NotificationItem {
   id: string;
@@ -109,6 +131,65 @@ export interface JitRevokeResult {
   id?: string;
   status?: string;
   revokedAt?: string;
+}
+
+/**
+ * JitSessionResponse — GET /api/jit/sessions (Authorization Service).
+ *
+ * A real Just-In-Time session: a `TemporaryPermission` row created by the
+ * `approval-granted` Kafka event. `remainingSeconds` is the live TTL countdown
+ * and `provisioningStatus` reports whether the cloud (Azure ARM) grant actually
+ * happened (`ACTIVE`) or the session is local-only (`LOCAL_ONLY`).
+ */
+export interface JitSession {
+  id: string;
+  approvalId: string;
+  userId: string;
+  userEmail?: string | null;
+  resourceId: string;
+  resourceName?: string | null;
+  action?: string | null;
+  requestedLevel: number;
+  status: JitStatus;
+  grantedAt: string;
+  expiresAt: string;
+  revokedAt?: string | null;
+  revokedByUserId?: string | null;
+  remainingSeconds: number;
+  provisioningStatus?: string | null;
+  provisioningDetail?: string | null;
+  /**
+   * Azure VM targeting, resolved from the Resource catalog when the session was
+   * created. Null for non-VM resources. `connectionCommand` is the exact command
+   * the user should run - it only works while the session is ACTIVE, because the
+   * "Virtual Machine User Login" role assignment exists for that window only.
+   */
+  targetVmName?: string | null;
+  targetHost?: string | null;
+  targetOsType?: string | null;
+  connectionCommand?: string | null;
+  targetResourceGroup?: string | null;
+}
+
+export type OnboardingTicketStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+/**
+ * OnboardingTicketResponse — Identity Service.
+ * GET /api/admin/onboarding/tickets, POST .../{id}/approve|reject.
+ */
+export interface OnboardingTicket {
+  id: string;
+  fullName: string;
+  email: string;
+  department: string;
+  requestedRole: string;
+  justification: string;
+  status: OnboardingTicketStatus;
+  createdAt: string;
+  reviewedAt?: string | null;
+  reviewedBy?: string | null;
+  rejectionReason?: string | null;
+  provisionedUserId?: string | null;
 }
 
 /** PagedResult<T> from the Notification and Audit services. */

@@ -50,9 +50,7 @@ export const AuditLog: React.FC = () => {
       <div className="page-header-row">
         <div>
           <h1 className="page-title">Audit Log</h1>
-          <p className="page-description">
-            Security and access events. Endpoint: <code>GET /api/audit/logs</code>.
-          </p>
+          <p className="page-description">Security and access events.</p>
         </div>
         <button type="button" className="secondary-action-btn" onClick={() => void load()}>
           <RefreshCw size={16} aria-hidden="true" />
