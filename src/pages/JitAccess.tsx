@@ -98,8 +98,7 @@ export const JitAccess: React.FC = () => {
       if (!status?.brokerConfigured || !status?.keyAvailable) {
         setTerminalLogin(login);
         setTerminalBlockReason(
-          status?.unavailableReason
-            || 'The brokered terminal is not available for this session.',
+          status?.unavailableReason || 'The brokered terminal is not available for this session.',
         );
         setTerminalFor(session);
         return;
@@ -332,9 +331,7 @@ export const JitAccess: React.FC = () => {
               </p>
               {/* Keyed on the id so switching sessions rebuilds the xterm instance
                   rather than reusing a disposed one. */}
-              <Suspense
-                fallback={<LoadingState message="Loading terminal…" />}
-              >
+              <Suspense fallback={<LoadingState message="Loading terminal…" />}>
                 <TerminalPanel
                   key={terminalFor.id}
                   permissionId={terminalFor.id}
