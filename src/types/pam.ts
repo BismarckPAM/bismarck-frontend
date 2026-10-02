@@ -100,10 +100,19 @@ export interface AuditLogEntry {
   consumedAt: string;
 }
 
+/**
+ * GET /api/audit/logs query parameters.
+ *
+ * `search` is the free-text box: a partial, case-insensitive match across
+ * Actor OR Resource. It is deliberately separate from `user`/`resource`, which
+ * remain exact-match filters.
+ */
 export interface AuditQuery {
+  search?: string;
   user?: string;
   resource?: string;
   eventType?: string;
+  outcome?: string;
   from?: string;
   to?: string;
   page?: number;

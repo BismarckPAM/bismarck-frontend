@@ -18,6 +18,28 @@ export function formatDuration(minutes?: number | null): string {
   return `${mins}m`;
 }
 
+/**
+ * Start of the selected calendar day in UTC, as an ISO instant.
+ *
+ * `<input type="date">` yields a bare `YYYY-MM-DD`. Appending `T00:00:00Z`
+ * converts the user's day selection into the instant the API expects, so
+ * "2026-10-01" is sent as `2026-10-01T00:00:00.000Z`.
+ */
+export function utcDayStart(value: string): string | undefined {
+  return value ? `${value}T00:00:00.000Z` : undefined;
+}
+
+/**
+ * Inclusive end of the selected calendar day in UTC, as an ISO instant.
+ *
+ * The API's `to` bound is inclusive (`OccurredAt <= to`), so sending midnight
+ * would silently exclude every event that happened during that day. Ending at
+ * `23:59:59.999` keeps the whole selected day.
+ */
+export function utcDayEnd(value: string): string | undefined {
+  return value ? `${value}T23:59:59.999Z` : undefined;
+}
+
 export const APPROVAL_LEVELS = [1, 2, 3, 4, 5] as const;
 
 export function levelLabel(level: number): string {
