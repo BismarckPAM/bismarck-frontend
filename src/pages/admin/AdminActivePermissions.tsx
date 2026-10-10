@@ -13,8 +13,8 @@ export interface JitSession {
   resourceName?: string;
   action?: string;
   requestedLevel: 'read' | 'write' | 'admin' | string;
-  grantedAt: string; // ISO String
-  expiresAt: string; // ISO String
+  grantedAt: string;
+  expiresAt: string;
   provisioningStatus?: 'active' | 'provisioning' | 'failed' | string;
 }
 
@@ -23,7 +23,7 @@ export interface Capabilities {
   jitRevoke: boolean;
 }
 
-export interface ActiveJitPermissionsProps {
+export interface AdminActivePermissionsProps {
   capabilities?: Capabilities;
   fetchSessions?: () => Promise<JitSession[]>;
   onRevokeSession?: (sessionId: string, reason: string) => Promise<void>;
@@ -142,14 +142,15 @@ const EmptyState: React.FC<{ title: string; message: string }> = ({ title, messa
    Main Component
    ========================================================================== */
 
-export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
+export const AdminActivePermissions: React.FC<AdminActivePermissionsProps> = ({
   capabilities = { jitList: true, jitRevoke: true },
   fetchSessions,
   onRevokeSession,
 }) => {
-  const [sessions, setSessions] = useState<JitSession[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  // Loading starts true only if JIT listing is active
+  const [loading, setLoading] = useState<boolean>(Boolean(capabilities.jitList));
   const [error, setError] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<JitSession[]>([]);
 
   const [message, setMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<{ message: string } | null>(null);
@@ -158,33 +159,55 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
   const [reason, setReason] = useState<string>('');
   const [busy, setBusy] = useState<boolean>(false);
 
-  // Load active sessions
-  const load = useCallback(async () => {
-    if (!capabilities.jitList) return;
+  // Trigger state for event-driven reloads (retry button or post-revoke)
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+
+  const load = useCallback(() => {
     setLoading(true);
     setError(null);
+    setRefreshKey((prev) => prev + 1);
+  }, []);
 
-    try {
-      if (fetchSessions) {
-        const data = await fetchSessions();
-        setSessions(data);
-      } else {
-        // Fallback default API call
-        const res = await fetch('/api/jit/sessions');
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const data = await res.json();
-        setSessions(data);
-      }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unknown error loading sessions');
-    } finally {
-      setLoading(false);
-    }
-  }, [capabilities.jitList, fetchSessions]);
-
+  // Fetch logic directly in effect to avoid calling setState synchronously in the effect body
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (!capabilities.jitList) {
+      return;
+    }
+
+    let isMounted = true;
+
+    async function fetchActiveSessions() {
+      try {
+        let data: JitSession[];
+        if (fetchSessions) {
+          data = await fetchSessions();
+        } else {
+          const res = await fetch('/api/jit/sessions');
+          if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+          data = await res.json();
+        }
+
+        if (isMounted) {
+          setSessions(data);
+          setError(null);
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Unknown error loading sessions');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void fetchActiveSessions();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [capabilities.jitList, fetchSessions, refreshKey]);
 
   // Handle Revoke submission
   const handleRevoke = async () => {
@@ -197,7 +220,6 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
       if (onRevokeSession) {
         await onRevokeSession(revokeTarget.id, reason);
       } else {
-        // Default API invocation
         const res = await fetch(`/api/jit/sessions/${revokeTarget.id}/revoke`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -222,7 +244,7 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
       );
       setRevokeTarget(null);
       setReason('');
-      await load();
+      load();
     } catch (err: unknown) {
       setActionError({
         message: err instanceof Error ? err.message : 'Failed to revoke permission.',
@@ -382,4 +404,4 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
   );
 };
 
-export default ActiveJitPermissions;
+export default AdminActivePermissions;
