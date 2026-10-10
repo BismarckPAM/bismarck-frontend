@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import './Onboarding.css';
 import { CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import {
   adminListOnboardingTickets,
@@ -98,11 +99,11 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container onboarding-page">
       <header className="page-header">
         <div>
           <h1 className="page-title">Onboarding Requests</h1>
-          <p className="page-subtitle">
+          <p className="page-description">
             Review registration requests. Approving provisions the account and sends an activation
             email.
           </p>
@@ -150,7 +151,12 @@ export default function Onboarding() {
           }
         />
       ) : (
-        <div className="wf-table-wrapper">
+        <div
+          className="wf-table-wrapper"
+          role="region"
+          aria-label="Onboarding requests table"
+          tabIndex={0}
+        >
           <table className="wf-table">
             <thead>
               <tr>

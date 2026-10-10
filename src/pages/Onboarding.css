@@ -1,0 +1,210 @@
+/* Onboarding administration: scoped to avoid changing other workflows. */
+.onboarding-page {
+  gap: 24px;
+}
+.onboarding-page .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.onboarding-page .page-header > div {
+  min-width: 0;
+  flex: 1 1 340px;
+}
+.onboarding-page .page-description {
+  max-width: 730px;
+  line-height: 1.65;
+}
+.onboarding-page .wf-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 650;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
+}
+.onboarding-page .wf-btn:focus-visible,
+.onboarding-page .wf-filter-chip:focus-visible {
+  outline: 3px solid #d9a4ce;
+  outline-offset: 2px;
+}
+.onboarding-page .wf-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.onboarding-page .wf-btn-secondary {
+  color: #71005f;
+  background: #fff;
+  border-color: rgba(113, 0, 95, 0.2);
+}
+.onboarding-page .wf-btn-secondary:hover:not(:disabled) {
+  background: #fbf1f9;
+}
+.onboarding-page .wf-btn-primary {
+  color: #fff;
+  background: #71005f;
+}
+.onboarding-page .wf-btn-primary:hover:not(:disabled) {
+  background: #900578;
+}
+.onboarding-page .wf-btn-danger {
+  color: #b42338;
+  background: #fff;
+  border-color: #f4b8c1;
+}
+.onboarding-page .wf-btn-danger:hover:not(:disabled) {
+  background: #fff1f3;
+}
+.onboarding-page .wf-btn-sm {
+  padding: 8px 11px;
+  font-size: 0.8rem;
+}
+.onboarding-page .wf-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.onboarding-page .wf-filter-chip {
+  padding: 9px 17px;
+  border-radius: 999px;
+  border: 1px solid rgba(113, 0, 95, 0.16);
+  background: white;
+  color: #6f5b6d;
+  font: inherit;
+  font-size: 0.87rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.onboarding-page .wf-filter-chip:hover {
+  background: #f9f0f8;
+  color: #71005f;
+}
+.onboarding-page .wf-filter-chip.active {
+  background: #71005f;
+  color: white;
+  border-color: #71005f;
+  box-shadow: 0 3px 10px rgba(113, 0, 95, 0.14);
+}
+.onboarding-page .wf-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(113, 0, 95, 0.12);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(45, 18, 41, 0.04);
+}
+.onboarding-page .wf-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 850px;
+  table-layout: auto;
+}
+.onboarding-page .wf-table th {
+  color: #6f5b6d;
+  background: #faf6fa;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  padding: 17px 16px;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(113, 0, 95, 0.12);
+}
+.onboarding-page .wf-table td {
+  color: #2b1626;
+  padding: 17px 16px;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(113, 0, 95, 0.08);
+  vertical-align: middle;
+}
+.onboarding-page .wf-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.onboarding-page .wf-table tbody tr:hover {
+  background: #fdf9fc;
+}
+.onboarding-page .wf-table th:first-child {
+  min-width: 215px;
+}
+.onboarding-page .wf-table th:last-child {
+  min-width: 190px;
+}
+.onboarding-page .wf-cell-primary {
+  color: #2b1626;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.onboarding-page .wf-cell-secondary {
+  color: #806d7d;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.onboarding-page .wf-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.onboarding-page .wf-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 650;
+  margin: 8px 0;
+}
+.onboarding-page .wf-textarea {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 9px;
+  border: 1px solid rgba(113, 0, 95, 0.2);
+  font: inherit;
+  color: #2b1626;
+  resize: vertical;
+}
+.onboarding-page .wf-textarea:focus {
+  outline: 2px solid #b41597;
+  outline-offset: 1px;
+}
+.onboarding-page .wf-state-text {
+  margin-top: 12px;
+  color: #6f5b6d;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.onboarding-page .wf-modal-body p {
+  line-height: 1.6;
+}
+.onboarding-page .wf-notice.error {
+  margin-top: 12px;
+  background: #fff1f3;
+  border-color: #fecdd3;
+  color: #b42338;
+}
+@media (max-width: 640px) {
+  .onboarding-page .page-header .wf-btn {
+    width: 100%;
+  }
+  .onboarding-page .wf-filter-chip {
+    padding: 8px 13px;
+  }
+  .onboarding-page .wf-table th,
+  .onboarding-page .wf-table td {
+    padding: 13px 12px;
+  }
+}
