@@ -218,7 +218,7 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
       setMessage(
         `Successfully revoked permission for ${
           revokeTarget.resourceName || revokeTarget.resourceId
-        }.`
+        }.`,
       );
       setRevokeTarget(null);
       setReason('');
@@ -257,18 +257,11 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
 
       {/* Main Content Area */}
       {!capabilities.jitList ? (
-        <EmptyState
-          title="JIT listing disabled"
-          message="Listing is disabled by configuration."
-        />
+        <EmptyState title="JIT listing disabled" message="Listing is disabled by configuration." />
       ) : loading ? (
         <LoadingState message="Loading active permissions…" />
       ) : error ? (
-        <ErrorState
-          title="Failed to load active permissions"
-          message={error}
-          onRetry={load}
-        />
+        <ErrorState title="Failed to load active permissions" message={error} onRetry={load} />
       ) : sessions.length === 0 ? (
         <EmptyState
           title="No active temporary permissions."
@@ -365,8 +358,8 @@ export const ActiveJitPermissions: React.FC<ActiveJitPermissionsProps> = ({
           <p>
             Revoke the active permission for{' '}
             <strong>{revokeTarget.resourceName || revokeTarget.resourceId}</strong> held by{' '}
-            <strong>{revokeTarget.userEmail || revokeTarget.userId}</strong>? This terminates any live
-            session immediately.
+            <strong>{revokeTarget.userEmail || revokeTarget.userId}</strong>? This terminates any
+            live session immediately.
           </p>
 
           <div className="form-group">
