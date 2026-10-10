@@ -1,6 +1,6 @@
 import { authorizationClient } from './client';
 import { normalizeApiError } from './errors';
-import { normalizeJitStatus, type JitRevokeResult, type JitSession } from '../types/pam';
+import { normalizeJitStatus, type JitSession } from '../types/pam';
 
 /** Normalize a raw JitSessionResponse into the typed domain shape. */
 function toJitSession(raw: Record<string, unknown>): JitSession {
@@ -57,19 +57,30 @@ export async function listJitSessions(activeOnly = false): Promise<JitSession[]>
 
 /**
  * Manually revoke an ACTIVE temporary (Just-In-Time) permission.
- * POST /api/authorization/permissions/{id}/revoke -> 200
+ * POST /api/jit/sessions/{id}/revoke  body: { reason?: string } -> 200 JitSessionResponse
  *
- * Admin-only on the backend: a non-Admin receives 403, an already
- * expired/revoked permission returns 409, and an unknown id returns 404.
+ * Admin or Security Admin on the backend: an ordinary user receives 403, an
+ * already expired/revoked session returns 409, and an unknown id returns 404.
  * The `id` is a `TemporaryPermission` id, which is the `id` returned by
  * `listJitSessions` — NOT an approval request id.
+ *
+ * This is deliberately the JIT-session endpoint rather than the older
+ * `/api/authorization/permissions/{id}/revoke`. Revocation here has IMMEDIATE
+ * effect: it closes the live brokered terminal, revokes the cloud role
+ * assignment (best effort), marks the permission REVOKED with RevokedAt /
+ * RevokedByUserId, and publishes the JIT revocation event. The older endpoint
+ * only flipped the database row, leaving a live shell running.
+ *
+ * The legacy endpoint remains on the server for backward compatibility; this
+ * helper simply no longer uses it.
  */
-export async function revokeTemporaryPermission(id: string): Promise<JitRevokeResult> {
+export async function revokeTemporaryPermission(id: string, reason?: string): Promise<JitSession> {
   try {
-    const { data } = await authorizationClient.post<JitRevokeResult>(
-      `/api/authorization/permissions/${id}/revoke`,
+    const { data } = await authorizationClient.post<Record<string, unknown>>(
+      `/api/jit/sessions/${id}/revoke`,
+      { reason: reason?.trim() ? reason.trim() : null },
     );
-    return data;
+    return toJitSession(data);
   } catch (error) {
     throw normalizeApiError(error);
   }

@@ -4,8 +4,13 @@ import type { AuditLogEntry, AuditQuery, PagedResult } from '../types/pam';
 
 /**
  * Query audit logs.
- * GET /api/audit/logs?user=&resource=&eventType=&from=&to=&page=&pageSize=
+ *
+ * GET /api/audit/logs?search=&user=&resource=&eventType=&outcome=&from=&to=&page=&pageSize=
  *   -> PagedResult<AuditLog>
+ *
+ * `search` is the free-text filter (partial, case-insensitive, Actor OR
+ * Resource); `user`/`resource`/`eventType`/`outcome` are exact-match filters.
+ * Undefined values are dropped, so an empty query string simply returns page 1.
  *
  * Authorization is enforced by the Audit Service ([Authorize]); the frontend
  * only hides the screen for roles that are not expected to have access.

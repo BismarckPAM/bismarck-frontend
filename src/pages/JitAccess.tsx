@@ -134,8 +134,11 @@ export const JitAccess: React.FC = () => {
     setBusy(true);
     setError(null);
     try {
-      const result = await revokeTemporaryPermission(revokeId);
-      setMessage(result.message || `Permission ${revokeId} revoked.`);
+      // The reason is finally transmitted: the JIT-session revoke endpoint records
+      // it on the revocation event, so it is part of the audit trail rather than a
+      // value the UI collected and dropped.
+      await revokeTemporaryPermission(revokeId, revokeReason);
+      setMessage(`Temporary permission revoked (session ${revokeId}).`);
       setRevokeId(null);
       setRevokeReason('');
       // Re-read from the server so the row flips to REVOKED authoritatively.
@@ -437,8 +440,9 @@ export const JitAccess: React.FC = () => {
             </div>
           )}
           <p>
-            Revoke the temporary permission for session <strong>{revokeId}</strong>? Endpoint:{' '}
-            <code>POST /api/authorization/permissions/{revokeId}/revoke</code>.
+            Revoke the temporary permission for session <strong>{revokeId}</strong>? This ends the
+            session immediately: any live terminal is closed and the cloud grant is removed.
+            Endpoint: <code>POST /api/jit/sessions/{revokeId}/revoke</code>.
           </p>
           <label className="form-group" htmlFor="revokeReason">
             <span className="form-label">Reason (optional, for your records)</span>

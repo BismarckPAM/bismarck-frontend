@@ -17,7 +17,7 @@ const terminalStatus = vi.fn().mockResolvedValue(null);
 
 vi.mock('../api/jit', () => ({
   listJitSessions: (activeOnly?: boolean) => listJit(activeOnly),
-  revokeTemporaryPermission: (id: string) => revoke(id),
+  revokeTemporaryPermission: (id: string, reason?: string) => revoke(id, reason),
 }));
 // Only the status probe is exercised here: it decides whether the terminal is
 // offered at all. The xterm view is replaced with a stub because jsdom has no
@@ -168,15 +168,35 @@ describe('JIT Access', () => {
   it('revokes a temporary permission using the session id and reports success', async () => {
     seedAuth('Admin');
     listJit.mockResolvedValue([activeSession]);
-    revoke.mockResolvedValue({ message: 'revoked ok' });
+    revoke.mockResolvedValue({});
     const user = userEvent.setup();
     renderJit();
 
     await user.click(await screen.findByRole('button', { name: /revoke/i }));
     await user.click(screen.getByRole('button', { name: /confirm revoke/i }));
 
-    await waitFor(() => expect(revoke).toHaveBeenCalledWith(activeSession.id));
-    expect(await screen.findByText(/revoked ok/i)).toBeInTheDocument();
+    // BIS-405: revocation now goes through the JIT-session endpoint, which has
+    // immediate effect (terminal close + cloud revoke + event), so the helper
+    // returns the updated session rather than a message envelope.
+    await waitFor(() => expect(revoke).toHaveBeenCalledWith(activeSession.id, ''));
+    expect(await screen.findByText(/temporary permission revoked/i)).toBeInTheDocument();
+  });
+
+  it('now sends the revoke reason that the modal collects', async () => {
+    seedAuth('Admin');
+    listJit.mockResolvedValue([activeSession]);
+    revoke.mockResolvedValue({});
+    const user = userEvent.setup();
+    renderJit();
+
+    await user.click(await screen.findByRole('button', { name: /revoke/i }));
+    // The reason was previously collected and then silently dropped.
+    await user.type(screen.getByLabelText(/reason/i), 'Incident INC-42 containment');
+    await user.click(screen.getByRole('button', { name: /confirm revoke/i }));
+
+    await waitFor(() =>
+      expect(revoke).toHaveBeenCalledWith(activeSession.id, 'Incident INC-42 containment'),
+    );
   });
 
   it('shows an error when revoke fails', async () => {
