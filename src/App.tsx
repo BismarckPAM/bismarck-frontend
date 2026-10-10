@@ -20,7 +20,10 @@ import Policies from './pages/Policies';
 import AccessCheck from './pages/AccessCheck';
 import Onboarding from './pages/Onboarding';
 import NotFound from './pages/NotFound';
-import { isApprover, canViewAudit, isAdmin } from './auth/roles';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminActivePermissions from './pages/admin/AdminActivePermissions';
+import { isApprover, canViewAudit, isAdmin, isAdminOrSecurityAdmin } from './auth/roles';
 
 export const App: React.FC = () => {
   return (
@@ -62,8 +65,51 @@ export const App: React.FC = () => {
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/resources" element={<Resources />} />
-                <Route path="/policies" element={<Policies />} />
+                {/* Legacy standalone policy route, kept for backward compatibility but
+                    now behind the same guard as the Admin Dashboard, so a normal
+                    authenticated user cannot reach policy management through it. */}
+                <Route
+                  path="/policies"
+                  element={
+                    <RequireRole allowed={isAdminOrSecurityAdmin}>
+                      <Policies />
+                    </RequireRole>
+                  }
+                />
                 <Route path="/access-check" element={<AccessCheck />} />
+
+                {/* BIS-405 Admin Dashboard.
+                    Nested React Router routes guarded as a single subtree: a direct
+                    hit on any child (/admin/users, /admin/policies, ...) lands on the
+                    same guard, so the sidebar link cannot be bypassed by typing a URL.
+                    Resources / Policies / Approval Queue are the EXISTING components —
+                    their behaviour and backend permission model are unchanged. */}
+                <Route
+                  path="/admin"
+                  element={
+                    <RequireRole allowed={isAdminOrSecurityAdmin}>
+                      <AdminDashboard />
+                    </RequireRole>
+                  }
+                >
+                  <Route index element={<Navigate to="/admin/users" replace />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="resources" element={<Resources />} />
+                  <Route path="policies" element={<Policies />} />
+                  {/* Approval authority is a separate capability: a Security Admin can
+                      reach the dashboard but is NOT automatically an approver. The
+                      existing isApprover check (and the Approval Service's own
+                      backend authorization) still decides. */}
+                  <Route
+                    path="approvals"
+                    element={
+                      <RequireRole allowed={isApprover}>
+                        <ApprovalQueue />
+                      </RequireRole>
+                    }
+                  />
+                  <Route path="permissions" element={<AdminActivePermissions />} />
+                </Route>
                 <Route
                   path="/onboarding"
                   element={
