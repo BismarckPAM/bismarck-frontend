@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle2, Send } from 'lucide-react';
-import { createApprovalRequest } from '../api/approval';
+import { createApprovalRequest, getMyRequests } from '../api/approval';
 import { isApiError } from '../api/errors';
 import { useWorkflow } from '../state/WorkflowContext';
+import { useAuth } from '../context/useAuth';
 import useResources from '../hooks/useResources';
 import { LoadingState, ErrorState } from '../components/common/StateViews';
 import { APPROVAL_LEVELS, levelLabel } from '../utils/format';
-import type { ApiError } from '../types/pam';
+import type { ApiError, ApprovalRequest } from '../types/pam';
 
 const MIN_REASON_LENGTH = 20;
 const MAX_DURATION_MINUTES = 1440;
@@ -25,6 +26,58 @@ const emptyForm: FormState = {
   reason: '',
   durationMinutes: '',
 };
+
+const RECONCILIATION_CLOCK_SKEW_MS = 2 * 60 * 1000;
+const RECONCILIATION_RETRY_DELAY_MS = 300;
+
+type SubmissionPayload = {
+  resourceId: string;
+  requestedLevel: number;
+  reason: string;
+  durationMinutes: number;
+};
+
+function matchesTimedOutSubmission(
+  request: ApprovalRequest,
+  payload: SubmissionPayload,
+  requesterId: string | undefined,
+  submissionStartedAt: number,
+  checkedAt: number,
+): boolean {
+  const createdAt = new Date(request.createdAt).getTime();
+  if (!requesterId || !Number.isFinite(createdAt)) return false;
+
+  return (
+    request.requesterUserId === requesterId &&
+    request.resourceId === payload.resourceId &&
+    request.requestedLevel === payload.requestedLevel &&
+    request.durationMinutes === payload.durationMinutes &&
+    request.reason.trim() === payload.reason &&
+    createdAt >= submissionStartedAt - RECONCILIATION_CLOCK_SKEW_MS &&
+    createdAt <= checkedAt + RECONCILIATION_CLOCK_SKEW_MS
+  );
+}
+
+async function reconcileTimedOutSubmission(
+  payload: SubmissionPayload,
+  requesterId: string | undefined,
+  submissionStartedAt: number,
+): Promise<ApprovalRequest | null> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const page = await getMyRequests();
+    const checkedAt = Date.now();
+    const matches = page.items.filter((request) =>
+      matchesTimedOutSubmission(request, payload, requesterId, submissionStartedAt, checkedAt),
+    );
+    if (matches.length === 1) return matches[0];
+    if (attempt === 0) {
+      await new Promise<void>((resolve) =>
+        window.setTimeout(resolve, RECONCILIATION_RETRY_DELAY_MS),
+      );
+    }
+  }
+  return null;
+}
 
 /** Client-side validation mirroring the Approval Service rules. */
 function validate(form: FormState): Record<string, string> {
@@ -54,13 +107,29 @@ function validate(form: FormState): Record<string, string> {
 export const RequestAccess: React.FC = () => {
   const { resources, isLoading: resourcesLoading, error: resourcesError } = useResources();
   const { addMyRequest, refreshNotifications } = useWorkflow();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const mountedRef = useRef(true);
 
   const [form, setForm] = useState<FormState>(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<ApiError | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState<{ id: string; status: string } | null>(null);
+  const [reconciliationState, setReconciliationState] = useState<'checking' | 'uncertain' | null>(
+    null,
+  );
+  const [success, setSuccess] = useState<{
+    id: string;
+    status: string;
+    reconciled?: boolean;
+  } | null>(null);
+
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    [],
+  );
 
   const update = (key: keyof FormState, value: string) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -71,19 +140,23 @@ export const RequestAccess: React.FC = () => {
     event.preventDefault();
     setSuccess(null);
     setGeneralError(null);
+    setReconciliationState(null);
 
     const errors = validate(form);
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
+    const payload: SubmissionPayload = {
+      resourceId: form.resourceId,
+      requestedLevel: Number(form.requestedLevel),
+      reason: form.reason.trim(),
+      durationMinutes: Number(form.durationMinutes),
+    };
+    const submissionStartedAt = Date.now();
     setIsSubmitting(true);
     try {
-      const created = await createApprovalRequest({
-        resourceId: form.resourceId,
-        requestedLevel: Number(form.requestedLevel),
-        reason: form.reason.trim(),
-        durationMinutes: Number(form.durationMinutes),
-      });
+      const created = await createApprovalRequest(payload);
+      if (!mountedRef.current) return;
       // Update state in place without a full reload.
       addMyRequest(created);
       void refreshNotifications();
@@ -92,6 +165,33 @@ export const RequestAccess: React.FC = () => {
       // Navigate to My Requests after a brief confirmation delay.
       window.setTimeout(() => navigate('/my-requests'), 900);
     } catch (error) {
+      if (isApiError(error) && error.kind === 'timeout') {
+        setReconciliationState('checking');
+        setGeneralError(null);
+
+        try {
+          const matched = await reconcileTimedOutSubmission(payload, user?.id, submissionStartedAt);
+          if (!mountedRef.current) return;
+
+          if (matched) {
+            addMyRequest(matched);
+            void refreshNotifications();
+            setSuccess({ id: matched.id, status: matched.status, reconciled: true });
+            setReconciliationState(null);
+            setForm(emptyForm);
+            window.setTimeout(() => navigate('/my-requests'), 900);
+          } else {
+            setReconciliationState('uncertain');
+          }
+        } catch {
+          if (mountedRef.current) setReconciliationState('uncertain');
+        } finally {
+          if (mountedRef.current) setIsSubmitting(false);
+        }
+        return;
+      }
+
+      if (!mountedRef.current) return;
       if (isApiError(error)) {
         setGeneralError(error);
         if (error.fieldErrors) {
@@ -106,7 +206,7 @@ export const RequestAccess: React.FC = () => {
       }
       // Keep entered form values on failure.
     } finally {
-      setIsSubmitting(false);
+      if (mountedRef.current) setIsSubmitting(false);
     }
   };
 
@@ -115,6 +215,7 @@ export const RequestAccess: React.FC = () => {
     setFieldErrors({});
     setGeneralError(null);
     setSuccess(null);
+    setReconciliationState(null);
   };
 
   if (resourcesLoading) return <LoadingState message="Loading resources…" />;
@@ -129,13 +230,33 @@ export const RequestAccess: React.FC = () => {
         </div>
       </div>
 
-      {success && (
+      {success?.reconciled && (
+        <div className="wf-success" role="status" data-testid="submit-success">
+          <CheckCircle2 size={18} aria-hidden="true" />
+          <span>Your access request was submitted successfully.</span>
+        </div>
+      )}
+
+      {success && !success.reconciled && (
         <div className="wf-success" role="status" data-testid="submit-success">
           <CheckCircle2 size={18} aria-hidden="true" />
           <span>
             Request <strong>{success.id}</strong> submitted with status{' '}
             <strong>{success.status}</strong>. Redirecting to My Requests…
           </span>
+        </div>
+      )}
+
+      {reconciliationState === 'checking' && (
+        <div className="wf-notice" role="status" data-testid="submit-reconciling">
+          Checking whether your access request was submitted...
+        </div>
+      )}
+
+      {reconciliationState === 'uncertain' && (
+        <div className="wf-error" role="alert" data-testid="submit-uncertain">
+          We couldn't confirm whether your request was submitted. Please check My Requests before
+          trying again. <Link to="/my-requests">Check My Requests</Link>
         </div>
       )}
 
@@ -219,7 +340,13 @@ export const RequestAccess: React.FC = () => {
         <div className="wf-form-actions">
           <button type="submit" className="primary-action-btn" disabled={isSubmitting}>
             <Send size={16} aria-hidden="true" />
-            <span>{isSubmitting ? 'Submitting…' : 'Submit Request'}</span>
+            <span>
+              {reconciliationState === 'checking'
+                ? 'Checking submission…'
+                : isSubmitting
+                  ? 'Submitting…'
+                  : 'Submit Request'}
+            </span>
           </button>
           <button
             type="button"

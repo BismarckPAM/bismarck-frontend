@@ -15,8 +15,10 @@ vi.mock('../api/resources', () => ({
 }));
 
 const createApprovalRequest = vi.fn();
+const getMyRequests = vi.fn();
 vi.mock('../api/approval', () => ({
   createApprovalRequest: (...args: unknown[]) => createApprovalRequest(...args),
+  getMyRequests: (...args: unknown[]) => getMyRequests(...args),
 }));
 
 const renderForm = () =>
@@ -44,6 +46,23 @@ const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
 describe('RequestAccess form', () => {
   beforeEach(() => {
     createApprovalRequest.mockReset();
+    getMyRequests.mockReset();
+    getMyRequests.mockResolvedValue({
+      items: [],
+      counters: { total: 0, pending: 0, approved: 0, rejected: 0 },
+    });
+    localStorage.setItem('bismarck_pam_token', 'test-token');
+    localStorage.setItem('bismarck_pam_expires_at', new Date(Date.now() + 3600000).toISOString());
+    localStorage.setItem(
+      'bismarck_pam_user',
+      JSON.stringify({
+        id: 'u1',
+        fullName: 'Test User',
+        email: 'test@example.com',
+        role: 'User',
+        department: 'Engineering',
+      }),
+    );
   });
 
   it('renders all required fields', async () => {
@@ -154,5 +173,56 @@ describe('RequestAccess form', () => {
     await user.click(screen.getByRole('button', { name: /submit request/i }));
 
     expect(await screen.findByTestId('submit-error')).toHaveTextContent(/Network error/i);
+  });
+
+  it('confirms a timed-out submission from the matching My Requests record', async () => {
+    createApprovalRequest.mockRejectedValue({ kind: 'timeout', message: 'The request timed out.' });
+    getMyRequests.mockResolvedValue({
+      items: [
+        {
+          id: 'req-timeout',
+          requesterUserId: 'u1',
+          resourceId: 'res-1',
+          requestedLevel: 3,
+          reason: 'Need write access to rotate credentials for incident 42.',
+          durationMinutes: 60,
+          status: 'PENDING',
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      counters: { total: 1, pending: 1, approved: 0, rejected: 0 },
+    });
+    const user = userEvent.setup();
+    renderForm();
+    await fillValidForm(user);
+    getMyRequests.mockClear();
+
+    await user.click(screen.getByRole('button', { name: /submit request/i }));
+
+    expect(await screen.findByTestId('submit-success')).toHaveTextContent(
+      /Your access request was submitted successfully/i,
+    );
+    expect(createApprovalRequest).toHaveBeenCalledTimes(1);
+    expect(getMyRequests).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText(/justification/i)).toHaveValue('');
+  });
+
+  it('keeps the form and reports uncertainty when a timed-out submission cannot be matched', async () => {
+    createApprovalRequest.mockRejectedValue({ kind: 'timeout', message: 'The request timed out.' });
+    getMyRequests.mockResolvedValue({
+      items: [],
+      counters: { total: 0, pending: 0, approved: 0, rejected: 0 },
+    });
+    const user = userEvent.setup();
+    renderForm();
+    await fillValidForm(user);
+
+    await user.click(screen.getByRole('button', { name: /submit request/i }));
+
+    expect(await screen.findByTestId('submit-uncertain')).toHaveTextContent(
+      /couldn't confirm whether your request was submitted/i,
+    );
+    expect(screen.getByLabelText(/duration \(minutes\)/i)).toHaveValue(60);
+    expect(createApprovalRequest).toHaveBeenCalledTimes(1);
   });
 });
