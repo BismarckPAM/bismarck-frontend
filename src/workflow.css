@@ -238,7 +238,7 @@
 .approval-queue-table,
 .admin-users-table {
   table-layout: fixed;
-  min-width: 1120px;
+  min-width: 1090px;
 }
 .approval-queue-table th,
 .approval-queue-table td,
@@ -248,32 +248,43 @@
   text-overflow: ellipsis;
 }
 .approval-queue-table .approval-col-request {
-  width: 105px;
+  width: 80px;
 }
 .approval-queue-table .approval-col-requester {
-  width: 205px;
+  width: 150px;
 }
 .approval-queue-table .approval-col-resource {
-  width: 205px;
+  width: 170px;
 }
 .approval-queue-table .approval-col-level {
-  width: 85px;
+  width: 70px;
 }
 .approval-queue-table .approval-col-duration {
-  width: 90px;
+  width: 75px;
 }
 .approval-queue-table .approval-col-created {
-  width: 165px;
+  width: 145px;
 }
 .approval-queue-table .approval-col-status {
-  width: 100px;
+  width: 90px;
 }
 .approval-queue-table .approval-col-actions {
-  width: 245px;
+  width: 310px;
 }
 .approval-queue-table .wf-wrap-cell {
   white-space: normal;
   overflow-wrap: anywhere;
+}
+.approval-queue-table .wf-actions-cell {
+  overflow: visible;
+  min-width: 310px;
+}
+.approval-queue-table .wf-actions-inner {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.approval-queue-table .wf-actions-inner > * {
+  flex: 0 0 auto;
 }
 .admin-users-table {
   min-width: 980px;
