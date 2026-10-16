@@ -181,7 +181,15 @@ export default function AdminUsers() {
           <EmptyState title="No matching accounts" message={`Nothing matched "${search}".`} />
         ) : (
           <div className="table-responsive-wrapper">
-            <table className="pam-data-table" aria-label="Admin user directory">
+            <table className="pam-data-table admin-users-table" aria-label="Admin user directory">
+              <colgroup>
+                <col className="admin-col-name" />
+                <col className="admin-col-email" />
+                <col className="admin-col-role" />
+                <col className="admin-col-department" />
+                <col className="admin-col-status" />
+                <col className="admin-col-action" />
+              </colgroup>
               <thead>
                 <tr>
                   <th scope="col">Full name</th>
@@ -199,7 +207,9 @@ export default function AdminUsers() {
                   return (
                     <tr key={item.id} className="pam-table-row">
                       <td className="wf-wrap-cell">{item.fullName}</td>
-                      <td className="wf-wrap-cell wf-email-cell">{item.email}</td>
+                      <td className="wf-wrap-cell wf-email-cell" title={item.email}>
+                        {item.email}
+                      </td>
                       <td className="wf-wrap-cell">{item.role || 'Unassigned'}</td>
                       <td className="wf-wrap-cell">{item.department}</td>
                       {/* Status is text, not colour alone (accessibility). */}

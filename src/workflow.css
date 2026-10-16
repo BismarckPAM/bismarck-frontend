@@ -213,15 +213,92 @@
 .wf-approval-actions .link-btn {
   padding: 8px 4px;
 }
+.wf-truncate-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .wf-wrap-cell {
   max-width: 260px;
   white-space: normal;
   overflow-wrap: anywhere;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .wf-email-cell {
   min-width: 180px;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-overflow: ellipsis;
+}
+
+/* Explicit tracks keep long identifiers from resizing adjacent columns. */
+.approval-queue-table,
+.admin-users-table {
+  table-layout: fixed;
+  min-width: 1120px;
+}
+.approval-queue-table th,
+.approval-queue-table td,
+.admin-users-table th,
+.admin-users-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.approval-queue-table .approval-col-request {
+  width: 105px;
+}
+.approval-queue-table .approval-col-requester {
+  width: 205px;
+}
+.approval-queue-table .approval-col-resource {
+  width: 205px;
+}
+.approval-queue-table .approval-col-level {
+  width: 85px;
+}
+.approval-queue-table .approval-col-duration {
+  width: 90px;
+}
+.approval-queue-table .approval-col-created {
+  width: 165px;
+}
+.approval-queue-table .approval-col-status {
+  width: 100px;
+}
+.approval-queue-table .approval-col-actions {
+  width: 245px;
+}
+.approval-queue-table .wf-wrap-cell {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.admin-users-table {
+  min-width: 980px;
+}
+.admin-users-table .admin-col-name {
+  width: 220px;
+}
+.admin-users-table .admin-col-email {
+  width: 285px;
+}
+.admin-users-table .admin-col-role {
+  width: 125px;
+}
+.admin-users-table .admin-col-department {
+  width: 155px;
+}
+.admin-users-table .admin-col-status {
+  width: 105px;
+}
+.admin-users-table .admin-col-action {
+  width: 220px;
+}
+.admin-users-table .wf-email-cell {
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 
 .wf-pagination {

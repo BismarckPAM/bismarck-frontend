@@ -142,7 +142,20 @@ export const ApprovalQueue: React.FC = () => {
         />
       ) : (
         <div className="table-responsive-wrapper">
-          <table className="pam-data-table" aria-label="Pending approval requests">
+          <table
+            className="pam-data-table approval-queue-table"
+            aria-label="Pending approval requests"
+          >
+            <colgroup>
+              <col className="approval-col-request" />
+              <col className="approval-col-requester" />
+              <col className="approval-col-resource" />
+              <col className="approval-col-level" />
+              <col className="approval-col-duration" />
+              <col className="approval-col-created" />
+              <col className="approval-col-status" />
+              <col className="approval-col-actions" />
+            </colgroup>
             <thead>
               <tr>
                 <th scope="col">Request</th>
@@ -158,7 +171,7 @@ export const ApprovalQueue: React.FC = () => {
             <tbody>
               {visible.map((request) => (
                 <tr key={request.id} className="pam-table-row">
-                  <td className="wf-mono" title={request.id}>
+                  <td className="wf-mono wf-truncate-cell" title={request.id}>
                     {request.id.slice(0, 8)}…
                   </td>
                   <td className="wf-wrap-cell">
