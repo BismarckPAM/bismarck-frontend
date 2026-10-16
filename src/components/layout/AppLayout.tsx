@@ -98,7 +98,9 @@ export const AppLayout: React.FC = () => {
               },
             ]
           : []),
-        { to: '/policies', icon: ListChecks, label: 'Access Policies', aria: 'Access policies' },
+        ...(adminDashboardVisible
+          ? [{ to: '/policies', icon: ListChecks, label: 'Access Policies', aria: 'Access policies' }]
+          : []),
         {
           to: '/access-check',
           icon: ScanSearch,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getResourcesApi } from '../api/resources';
 import type { Resource } from '../types/resource';
+import { getResourceLabel } from '../utils/resourceLabel';
 
 /**
  * Loads the privileged resource catalogue once and exposes a lookup.
@@ -30,7 +31,7 @@ export function useResources() {
 
   const resourceName = (id: string): string => {
     const match = resources.find((resource) => resource.id === id);
-    return match?.name || match?.type || id;
+    return match ? getResourceLabel(match) : id;
   };
 
   return { resources, isLoading, error, resourceName };

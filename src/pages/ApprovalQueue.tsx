@@ -158,9 +158,9 @@ export const ApprovalQueue: React.FC = () => {
             <tbody>
               {visible.map((request) => (
                 <tr key={request.id} className="pam-table-row">
-                  <td className="wf-mono">{request.id.slice(0, 8)}…</td>
-                  <td>{request.requesterUserId}</td>
-                  <td>{resourceName(request.resourceId)}</td>
+                  <td className="wf-mono" title={request.id}>{request.id.slice(0, 8)}…</td>
+                  <td className="wf-wrap-cell">{request.requesterName || request.requesterEmail || request.requesterUserId}</td>
+                  <td className="wf-wrap-cell">{request.resourceName || resourceName(request.resourceId)}</td>
                   <td>{levelLabel(request.requestedLevel)}</td>
                   <td>{formatDuration(request.durationMinutes)}</td>
                   <td>{formatDateTime(request.createdAt)}</td>
@@ -168,6 +168,7 @@ export const ApprovalQueue: React.FC = () => {
                     <ApprovalStatusBadge status={request.status} />
                   </td>
                   <td className="wf-actions-cell">
+                    <div className="wf-actions-inner wf-approval-actions">
                     <button
                       type="button"
                       className="link-btn"
@@ -199,6 +200,7 @@ export const ApprovalQueue: React.FC = () => {
                       <X size={16} aria-hidden="true" />
                       <span>Reject</span>
                     </button>
+                    </div>
                   </td>
                 </tr>
               ))}

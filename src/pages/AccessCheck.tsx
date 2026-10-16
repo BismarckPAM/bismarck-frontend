@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Clock3, ShieldCheck } from 'lucide-react';
 import { checkAuthorizationApi } from '../api/authorization';
 import { getResourcesApi } from '../api/resources';
@@ -6,6 +6,8 @@ import { getUsersApi } from '../api/users';
 import type { Resource } from '../types/resource';
 import type { User } from '../types/auth';
 import type { AuthorizationDecisionResult } from '../types/policy';
+import { getResourceOptionLabel } from '../utils/resourceLabel';
+import { AuthContext } from '../context/AuthContext';
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Unable to complete the access check.';
@@ -22,6 +24,7 @@ const actionOptions = [
 ] as const;
 
 export default function AccessCheck() {
+  const currentUser = useContext(AuthContext)?.user;
   const [users, setUsers] = useState<User[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [userId, setUserId] = useState('');
@@ -42,7 +45,10 @@ export default function AccessCheck() {
         ]);
         setUsers(loadedUsers);
         setResources(loadedResources);
-        setUserId(loadedUsers[0]?.id ?? '');
+        const initialUser = currentUser?.id && loadedUsers.some((item) => item.id === currentUser.id)
+          ? currentUser.id
+          : loadedUsers[0]?.id ?? '';
+        setUserId(initialUser);
         const approvalResource = loadedResources.find(
           (resource) =>
             resource.environment?.toUpperCase() === 'PRODUCTION' ||
@@ -56,7 +62,7 @@ export default function AccessCheck() {
       }
     };
     void loadOptions();
-  }, []);
+  }, [currentUser]);
 
   const runCheck = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -136,7 +142,7 @@ export default function AccessCheck() {
                   <option value="">Select a resource</option>
                   {resources.map((resource) => (
                     <option key={resource.id} value={resource.id}>
-                      {resource.type} · {resource.environment}
+                      {getResourceOptionLabel(resource)}
                     </option>
                   ))}
                 </select>

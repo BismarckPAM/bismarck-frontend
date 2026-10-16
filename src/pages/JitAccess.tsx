@@ -193,9 +193,7 @@ export const JitAccess: React.FC = () => {
       <td>{formatDateTime(session.grantedAt)}</td>
       <td>
         {remainingLabel(session)}
-        {session.provisioningStatus && (
-          <div className="wf-hint">Provisioning: {session.provisioningStatus}</div>
-        )}
+        {session.provisioningStatus && <span className="wf-session-provisioning">Provisioning: {session.provisioningStatus}</span>}
       </td>
       <td className="wf-actions-cell">
         {session.status === 'ACTIVE' && canRevokePermissions(user) && capabilities.jitRevoke ? (
@@ -287,7 +285,7 @@ export const JitAccess: React.FC = () => {
       {connectable.length > 0 && (
         <>
           <h2 className="panel-title">Connect to your granted machines</h2>
-          <p className="wf-hint">
+          <p className="wf-connect-description">
             These commands work only while the session is <strong>ACTIVE</strong>. Access is
             authorised by an Azure role assignment that is removed automatically when the timer
             reaches zero, or when an administrator revokes it.
@@ -327,9 +325,9 @@ export const JitAccess: React.FC = () => {
                   </button>
                 ) : null}
               </div>
-              <div className="wf-hint">
+              <div className="wf-connect-expiry">
                 Expires in {remainingLabel(session)}
-                {session.provisioningStatus && ` · Provisioning: ${session.provisioningStatus}`}
+                {session.provisioningStatus && <span>Provisioning: {session.provisioningStatus}</span>}
               </div>
             </div>
           ))}

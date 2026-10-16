@@ -64,7 +64,9 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <UnsupportedNotice message="The personal request counters below reflect requests submitted during this browser session: the backend exposes no 'my requests' or JIT 'list' endpoints, so a full server-side history is not available. The Access Analytics section further down is different: it is real server-side data reported by the Analytics Service." />
+      <UnsupportedNotice
+        message={`The personal request counters below reflect requests submitted during this browser session: the backend exposes no 'my requests' or JIT 'list' endpoints, so a full server-side history is not available.${canViewAudit(user) ? ' Access Analytics below uses real server-side data reported by the Analytics Service.' : ''}`}
+      />
 
       <div className="metrics-grid">
         <article className="metric-card">
