@@ -38,7 +38,9 @@ const SECTIONS: AdminSection[] = [
 
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const sections = isApprover(user) ? SECTIONS : SECTIONS.filter((section) => !section.to.endsWith('/approvals'));
+  const sections = isApprover(user)
+    ? SECTIONS
+    : SECTIONS.filter((section) => !section.to.endsWith('/approvals'));
 
   return (
     <div className="page-container">

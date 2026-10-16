@@ -173,7 +173,9 @@ export default function Onboarding() {
                 <tr key={ticket.id}>
                   <td>
                     <div className="wf-cell-primary">{ticket.fullName}</div>
-                    <div className="wf-cell-secondary wf-email-value" title={ticket.email}>{ticket.email}</div>
+                    <div className="wf-cell-secondary wf-email-value" title={ticket.email}>
+                      {ticket.email}
+                    </div>
                   </td>
                   <td>{ticket.department || '—'}</td>
                   <td>{ticket.requestedRole || '—'}</td>

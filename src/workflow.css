@@ -3,7 +3,12 @@
    to safe values so the screen never depends on a missing variable. */
 
 /* ---- Layout / page scaffolding ---- */
-.page-container { width: 100%; display: flex; flex-direction: column; gap: 20px; }
+.page-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
 .panel-title {
   font-size: 1.05rem;
@@ -202,8 +207,12 @@
   gap: 8px;
   flex-wrap: wrap;
 }
-.wf-approval-actions { flex-wrap: nowrap; }
-.wf-approval-actions .link-btn { padding: 8px 4px; }
+.wf-approval-actions {
+  flex-wrap: nowrap;
+}
+.wf-approval-actions .link-btn {
+  padding: 8px 4px;
+}
 
 .wf-wrap-cell {
   max-width: 260px;
@@ -215,9 +224,28 @@
   min-width: 180px;
 }
 
-.wf-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding: 14px 20px; color: var(--text-secondary, #6f5b6d); font-size: 0.82rem; }
-.wf-pagination label { display: inline-flex; align-items: center; gap: 6px; }
-.wf-pagination select { padding: 6px 8px; border: 1px solid var(--border-medium); border-radius: 6px; background: #fff; font: inherit; }
+.wf-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  color: var(--text-secondary, #6f5b6d);
+  font-size: 0.82rem;
+}
+.wf-pagination label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wf-pagination select {
+  padding: 6px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+}
 
 .wf-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -558,9 +586,24 @@
   border-radius: 8px;
 }
 
-.wf-bell-item-title { font-size: 0.9rem; font-weight: 700; line-height: 1.35; }
-.wf-bell-item-message { margin: 5px 0 0; font-size: 0.86rem; line-height: 1.5; overflow-wrap: anywhere; }
-.wf-bell-item-meta { display: block; margin-top: 6px; color: var(--text-muted, #99899b); font-size: 0.76rem; line-height: 1.4; }
+.wf-bell-item-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.wf-bell-item-message {
+  margin: 5px 0 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.wf-bell-item-meta {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-muted, #99899b);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
 
 .wf-bell-item-button:hover {
   background: rgba(113, 0, 95, 0.05);
@@ -899,11 +942,34 @@
   flex-wrap: wrap;
 }
 
-.wf-connect-description { max-width: 75ch; margin: 0; color: var(--text-secondary, #6f5b6d); line-height: 1.6; }
-.wf-session-provisioning { display: block; margin-top: 5px; color: var(--text-muted, #99899b); font-size: 0.8rem; }
-.wf-connect-expiry { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; color: var(--text-secondary, #6f5b6d); }
-.wf-connect-expiry span { color: var(--text-muted, #99899b); }
-.wf-email-value { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wf-connect-description {
+  max-width: 75ch;
+  margin: 0;
+  color: var(--text-secondary, #6f5b6d);
+  line-height: 1.6;
+}
+.wf-session-provisioning {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-muted, #99899b);
+  font-size: 0.8rem;
+}
+.wf-connect-expiry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+  color: var(--text-secondary, #6f5b6d);
+}
+.wf-connect-expiry span {
+  color: var(--text-muted, #99899b);
+}
+.wf-email-value {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .wf-connect-command {
   display: flex;

@@ -45,9 +45,10 @@ export default function AccessCheck() {
         ]);
         setUsers(loadedUsers);
         setResources(loadedResources);
-        const initialUser = currentUser?.id && loadedUsers.some((item) => item.id === currentUser.id)
-          ? currentUser.id
-          : loadedUsers[0]?.id ?? '';
+        const initialUser =
+          currentUser?.id && loadedUsers.some((item) => item.id === currentUser.id)
+            ? currentUser.id
+            : (loadedUsers[0]?.id ?? '');
         setUserId(initialUser);
         const approvalResource = loadedResources.find(
           (resource) =>

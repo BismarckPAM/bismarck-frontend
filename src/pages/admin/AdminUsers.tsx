@@ -213,42 +213,42 @@ export default function AdminUsers() {
                       </td>
                       <td className="wf-actions-cell">
                         <div className="wf-actions-inner">
-                        {item.isActive ? (
-                          <button
-                            type="button"
-                            className="reject-btn"
-                            // Self-deactivation is blocked: an admin who switches
-                            // their own account off loses console access, and the
-                            // current token stays valid until it expires.
-                            disabled={busy || isSelf}
-                            title={
-                              isSelf
-                                ? 'You cannot deactivate your own account'
-                                : `Deactivate ${item.fullName}`
-                            }
-                            aria-label={`Deactivate ${item.fullName}`}
-                            onClick={() => {
-                              setActionError(null);
-                              setMessage(null);
-                              setPendingDeactivate(item);
-                            }}
-                          >
-                            <ShieldOff size={16} aria-hidden="true" />
-                            <span>Deactivate</span>
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="approve-btn"
-                            disabled={busy}
-                            title={`Activate ${item.fullName}`}
-                            aria-label={`Activate ${item.fullName}`}
-                            onClick={() => void applyStatus(item, true)}
-                          >
-                            <UserCheck size={16} aria-hidden="true" />
-                            <span>Activate</span>
-                          </button>
-                        )}
+                          {item.isActive ? (
+                            <button
+                              type="button"
+                              className="reject-btn"
+                              // Self-deactivation is blocked: an admin who switches
+                              // their own account off loses console access, and the
+                              // current token stays valid until it expires.
+                              disabled={busy || isSelf}
+                              title={
+                                isSelf
+                                  ? 'You cannot deactivate your own account'
+                                  : `Deactivate ${item.fullName}`
+                              }
+                              aria-label={`Deactivate ${item.fullName}`}
+                              onClick={() => {
+                                setActionError(null);
+                                setMessage(null);
+                                setPendingDeactivate(item);
+                              }}
+                            >
+                              <ShieldOff size={16} aria-hidden="true" />
+                              <span>Deactivate</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="approve-btn"
+                              disabled={busy}
+                              title={`Activate ${item.fullName}`}
+                              aria-label={`Activate ${item.fullName}`}
+                              onClick={() => void applyStatus(item, true)}
+                            >
+                              <UserCheck size={16} aria-hidden="true" />
+                              <span>Activate</span>
+                            </button>
+                          )}
                         </div>
                         {isSelf && (
                           <div className="wf-hint">You cannot deactivate your own account.</div>
@@ -263,15 +263,42 @@ export default function AdminUsers() {
         )}
         {!loading && !error && visible.length > 0 && (
           <div className="wf-pagination" aria-label="User directory pagination">
-            <span>Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, visible.length)} of {visible.length}</span>
-            <label>Rows
-              <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
-                {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+            <span>
+              Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, visible.length)} of{' '}
+              {visible.length}
+            </span>
+            <label>
+              Rows
+              <select
+                value={pageSize}
+                onChange={(event) => setPageSize(Number(event.target.value))}
+              >
+                {[10, 25, 50].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
               </select>
             </label>
-            <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1}>Previous</button>
-            <span>Page {page} of {pageCount}</span>
-            <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount}>Next</button>
+            <button
+              type="button"
+              className="secondary-action-btn"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </button>
+            <span>
+              Page {page} of {pageCount}
+            </span>
+            <button
+              type="button"
+              className="secondary-action-btn"
+              onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+              disabled={page === pageCount}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

@@ -158,9 +158,15 @@ export const ApprovalQueue: React.FC = () => {
             <tbody>
               {visible.map((request) => (
                 <tr key={request.id} className="pam-table-row">
-                  <td className="wf-mono" title={request.id}>{request.id.slice(0, 8)}…</td>
-                  <td className="wf-wrap-cell">{request.requesterName || request.requesterEmail || request.requesterUserId}</td>
-                  <td className="wf-wrap-cell">{request.resourceName || resourceName(request.resourceId)}</td>
+                  <td className="wf-mono" title={request.id}>
+                    {request.id.slice(0, 8)}…
+                  </td>
+                  <td className="wf-wrap-cell">
+                    {request.requesterName || request.requesterEmail || request.requesterUserId}
+                  </td>
+                  <td className="wf-wrap-cell">
+                    {request.resourceName || resourceName(request.resourceId)}
+                  </td>
                   <td>{levelLabel(request.requestedLevel)}</td>
                   <td>{formatDuration(request.durationMinutes)}</td>
                   <td>{formatDateTime(request.createdAt)}</td>
@@ -169,37 +175,37 @@ export const ApprovalQueue: React.FC = () => {
                   </td>
                   <td className="wf-actions-cell">
                     <div className="wf-actions-inner wf-approval-actions">
-                    <button
-                      type="button"
-                      className="link-btn"
-                      onClick={() => setSelected(request)}
-                      aria-label={`View details for request ${request.id}`}
-                    >
-                      <Eye size={16} aria-hidden="true" />
-                      <span>Details</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="approve-btn"
-                      onClick={() => setConfirmApprove(request)}
-                      disabled={busyId === request.id}
-                    >
-                      <Check size={16} aria-hidden="true" />
-                      <span>Approve</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="reject-btn"
-                      onClick={() => {
-                        setRejectTarget(request);
-                        setRejectReason('');
-                        setRejectError(null);
-                      }}
-                      disabled={busyId === request.id}
-                    >
-                      <X size={16} aria-hidden="true" />
-                      <span>Reject</span>
-                    </button>
+                      <button
+                        type="button"
+                        className="link-btn"
+                        onClick={() => setSelected(request)}
+                        aria-label={`View details for request ${request.id}`}
+                      >
+                        <Eye size={16} aria-hidden="true" />
+                        <span>Details</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="approve-btn"
+                        onClick={() => setConfirmApprove(request)}
+                        disabled={busyId === request.id}
+                      >
+                        <Check size={16} aria-hidden="true" />
+                        <span>Approve</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="reject-btn"
+                        onClick={() => {
+                          setRejectTarget(request);
+                          setRejectReason('');
+                          setRejectError(null);
+                        }}
+                        disabled={busyId === request.id}
+                      >
+                        <X size={16} aria-hidden="true" />
+                        <span>Reject</span>
+                      </button>
                     </div>
                   </td>
                 </tr>

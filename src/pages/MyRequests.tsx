@@ -85,7 +85,10 @@ export const MyRequests: React.FC = () => {
                 className="search-input"
                 placeholder="Search by resource, reason, or request ID…"
                 value={search}
-                onChange={(event) => { setSearch(event.target.value); setPage(1); }}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(1);
+                }}
                 aria-label="Search my requests"
               />
             </div>
@@ -93,7 +96,10 @@ export const MyRequests: React.FC = () => {
               <select
                 className="role-filter-select"
                 value={statusFilter}
-                onChange={(event) => { setStatusFilter(event.target.value as 'ALL' | ApprovalStatus); setPage(1); }}
+                onChange={(event) => {
+                  setStatusFilter(event.target.value as 'ALL' | ApprovalStatus);
+                  setPage(1);
+                }}
                 aria-label="Filter by status"
               >
                 <option value="ALL">All statuses</option>
@@ -104,7 +110,10 @@ export const MyRequests: React.FC = () => {
               <select
                 className="role-filter-select"
                 value={sort}
-                onChange={(event) => { setSort(event.target.value as SortKey); setPage(1); }}
+                onChange={(event) => {
+                  setSort(event.target.value as SortKey);
+                  setPage(1);
+                }}
                 aria-label="Sort requests"
               >
                 <option value="newest">Newest first</option>
@@ -136,7 +145,9 @@ export const MyRequests: React.FC = () => {
                 <tbody>
                   {paged.map((request) => (
                     <tr key={request.id} className="pam-table-row">
-                      <td className="wf-mono" title={request.id}>{request.id.slice(0, 8)}…</td>
+                      <td className="wf-mono" title={request.id}>
+                        {request.id.slice(0, 8)}…
+                      </td>
                       <td>{request.resourceName || resourceName(request.resourceId)}</td>
                       <td>{levelLabel(request.requestedLevel)}</td>
                       <td>{formatDuration(request.durationMinutes)}</td>
@@ -160,10 +171,29 @@ export const MyRequests: React.FC = () => {
                 </tbody>
               </table>
               <div className="wf-pagination" aria-label="My requests pagination">
-                <span>Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, visible.length)} of {visible.length}</span>
-                <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1}>Previous</button>
-                <span>Page {page} of {pageCount}</span>
-                <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount}>Next</button>
+                <span>
+                  Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, visible.length)} of{' '}
+                  {visible.length}
+                </span>
+                <button
+                  type="button"
+                  className="secondary-action-btn"
+                  onClick={() => setPage((current) => Math.max(1, current - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {page} of {pageCount}
+                </span>
+                <button
+                  type="button"
+                  className="secondary-action-btn"
+                  onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+                  disabled={page === pageCount}
+                >
+                  Next
+                </button>
               </div>
             </div>
           )}

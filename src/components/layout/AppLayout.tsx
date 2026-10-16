@@ -99,7 +99,14 @@ export const AppLayout: React.FC = () => {
             ]
           : []),
         ...(adminDashboardVisible
-          ? [{ to: '/policies', icon: ListChecks, label: 'Access Policies', aria: 'Access policies' }]
+          ? [
+              {
+                to: '/policies',
+                icon: ListChecks,
+                label: 'Access Policies',
+                aria: 'Access policies',
+              },
+            ]
           : []),
         {
           to: '/access-check',

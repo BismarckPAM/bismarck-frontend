@@ -193,7 +193,11 @@ export const JitAccess: React.FC = () => {
       <td>{formatDateTime(session.grantedAt)}</td>
       <td>
         {remainingLabel(session)}
-        {session.provisioningStatus && <span className="wf-session-provisioning">Provisioning: {session.provisioningStatus}</span>}
+        {session.provisioningStatus && (
+          <span className="wf-session-provisioning">
+            Provisioning: {session.provisioningStatus}
+          </span>
+        )}
       </td>
       <td className="wf-actions-cell">
         {session.status === 'ACTIVE' && canRevokePermissions(user) && capabilities.jitRevoke ? (
@@ -327,7 +331,9 @@ export const JitAccess: React.FC = () => {
               </div>
               <div className="wf-connect-expiry">
                 Expires in {remainingLabel(session)}
-                {session.provisioningStatus && <span>Provisioning: {session.provisioningStatus}</span>}
+                {session.provisioningStatus && (
+                  <span>Provisioning: {session.provisioningStatus}</span>
+                )}
               </div>
             </div>
           ))}

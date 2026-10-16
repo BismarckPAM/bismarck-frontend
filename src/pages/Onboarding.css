@@ -156,7 +156,9 @@
   font-size: 0.8rem;
   overflow-wrap: anywhere;
 }
-.onboarding-page .wf-email-value { overflow-wrap: normal; }
+.onboarding-page .wf-email-value {
+  overflow-wrap: normal;
+}
 .onboarding-page .wf-row-actions {
   display: flex;
   align-items: center;
