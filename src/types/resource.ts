@@ -11,5 +11,12 @@ export interface Resource {
   ipAddress?: string;
   hostname?: string;
   port?: number;
+  owner?: string;
+  isActive?: boolean;
+  azureVmName?: string;
+  azureResourceGroup?: string;
+  azureResourceId?: string;
+  osType?: string;
+  publicHost?: string;
   createdAt?: string;
 }

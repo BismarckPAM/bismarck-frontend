@@ -140,7 +140,8 @@
   background: #fdf9fc;
 }
 .onboarding-page .wf-table th:first-child {
-  min-width: 215px;
+  width: 270px;
+  min-width: 270px;
 }
 .onboarding-page .wf-table th:last-child {
   min-width: 190px;
@@ -155,6 +156,7 @@
   font-size: 0.8rem;
   overflow-wrap: anywhere;
 }
+.onboarding-page .wf-email-value { overflow-wrap: normal; }
 .onboarding-page .wf-row-actions {
   display: flex;
   align-items: center;

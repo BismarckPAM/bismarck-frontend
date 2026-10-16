@@ -1,5 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
+import { useAuth } from '../../context/useAuth';
+import { isApprover } from '../../auth/roles';
 
 interface AdminSection {
   to: string;
@@ -35,6 +37,9 @@ const SECTIONS: AdminSection[] = [
 ];
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
+  const sections = isApprover(user) ? SECTIONS : SECTIONS.filter((section) => !section.to.endsWith('/approvals'));
+
   return (
     <div className="page-container">
       <div className="page-header-row">
@@ -54,7 +59,7 @@ export default function AdminDashboard() {
       {/* Section navigation. end={true} keeps "Users & Roles" from staying lit
           while on a sibling route, which is what users expect from a tab bar. */}
       <nav className="admin-nav" aria-label="Administration sections">
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <NavLink
             key={section.to}
             to={section.to}

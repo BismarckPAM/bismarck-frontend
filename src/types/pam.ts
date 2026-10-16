@@ -30,7 +30,12 @@ export function normalizeJitStatus(value: unknown): JitStatus {
 export interface ApprovalRequest {
   id: string;
   requesterUserId: string;
+  requesterName?: string | null;
+  requesterEmail?: string | null;
   resourceId: string;
+  resourceName?: string | null;
+  resourceType?: string | null;
+  action?: string | null;
   requestedLevel: number;
   reason: string;
   durationMinutes: number;

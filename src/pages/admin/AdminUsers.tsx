@@ -26,6 +26,8 @@ export default function AdminUsers() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [pendingDeactivate, setPendingDeactivate] = useState<ManagedUser | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,6 +85,20 @@ export default function AdminUsers() {
 
   const activeCount = users.filter((item) => item.isActive).length;
   const inactiveCount = users.length - activeCount;
+  const pageCount = Math.max(1, Math.ceil(visible.length / pageSize));
+  const pagedUsers = visible.slice((page - 1) * pageSize, page * pageSize);
+
+  useEffect(() => {
+    // Pagination is derived from a changing filtered result set; clamp the
+    // current page after filtering so a removed last page cannot render empty.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage((current) => Math.min(current, pageCount));
+  }, [pageCount]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(1);
+  }, [query, pageSize]);
 
   return (
     <>
@@ -177,15 +193,15 @@ export default function AdminUsers() {
                 </tr>
               </thead>
               <tbody>
-                {visible.map((item) => {
+                {pagedUsers.map((item) => {
                   const isSelf = user?.id === item.id;
                   const busy = busyId === item.id;
                   return (
                     <tr key={item.id} className="pam-table-row">
-                      <td>{item.fullName}</td>
-                      <td>{item.email}</td>
-                      <td>{item.role || 'Unassigned'}</td>
-                      <td>{item.department}</td>
+                      <td className="wf-wrap-cell">{item.fullName}</td>
+                      <td className="wf-wrap-cell wf-email-cell">{item.email}</td>
+                      <td className="wf-wrap-cell">{item.role || 'Unassigned'}</td>
+                      <td className="wf-wrap-cell">{item.department}</td>
                       {/* Status is text, not colour alone (accessibility). */}
                       <td>
                         <span
@@ -196,6 +212,7 @@ export default function AdminUsers() {
                         </span>
                       </td>
                       <td className="wf-actions-cell">
+                        <div className="wf-actions-inner">
                         {item.isActive ? (
                           <button
                             type="button"
@@ -232,6 +249,7 @@ export default function AdminUsers() {
                             <span>Activate</span>
                           </button>
                         )}
+                        </div>
                         {isSelf && (
                           <div className="wf-hint">You cannot deactivate your own account.</div>
                         )}
@@ -241,6 +259,19 @@ export default function AdminUsers() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+        {!loading && !error && visible.length > 0 && (
+          <div className="wf-pagination" aria-label="User directory pagination">
+            <span>Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, visible.length)} of {visible.length}</span>
+            <label>Rows
+              <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
+                {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+              </select>
+            </label>
+            <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1}>Previous</button>
+            <span>Page {page} of {pageCount}</span>
+            <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount}>Next</button>
           </div>
         )}
       </div>

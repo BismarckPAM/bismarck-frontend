@@ -21,6 +21,8 @@ export const MyRequests: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'ALL' | ApprovalStatus>('ALL');
   const [sort, setSort] = useState<SortKey>('newest');
   const [selected, setSelected] = useState<ApprovalRequest | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -40,6 +42,8 @@ export const MyRequests: React.FC = () => {
     else sorted.sort((a, b) => a.status.localeCompare(b.status));
     return sorted;
   }, [myRequests, search, statusFilter, sort]);
+  const pageCount = Math.max(1, Math.ceil(visible.length / pageSize));
+  const paged = visible.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <section className="page-container">
@@ -81,7 +85,7 @@ export const MyRequests: React.FC = () => {
                 className="search-input"
                 placeholder="Search by resource, reason, or request ID…"
                 value={search}
-                onChange={(event) => setSearch(event.target.value)}
+                onChange={(event) => { setSearch(event.target.value); setPage(1); }}
                 aria-label="Search my requests"
               />
             </div>
@@ -89,7 +93,7 @@ export const MyRequests: React.FC = () => {
               <select
                 className="role-filter-select"
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as 'ALL' | ApprovalStatus)}
+                onChange={(event) => { setStatusFilter(event.target.value as 'ALL' | ApprovalStatus); setPage(1); }}
                 aria-label="Filter by status"
               >
                 <option value="ALL">All statuses</option>
@@ -100,7 +104,7 @@ export const MyRequests: React.FC = () => {
               <select
                 className="role-filter-select"
                 value={sort}
-                onChange={(event) => setSort(event.target.value as SortKey)}
+                onChange={(event) => { setSort(event.target.value as SortKey); setPage(1); }}
                 aria-label="Sort requests"
               >
                 <option value="newest">Newest first</option>
@@ -130,10 +134,10 @@ export const MyRequests: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {visible.map((request) => (
+                  {paged.map((request) => (
                     <tr key={request.id} className="pam-table-row">
-                      <td className="wf-mono">{request.id.slice(0, 8)}…</td>
-                      <td>{resourceName(request.resourceId)}</td>
+                      <td className="wf-mono" title={request.id}>{request.id.slice(0, 8)}…</td>
+                      <td>{request.resourceName || resourceName(request.resourceId)}</td>
                       <td>{levelLabel(request.requestedLevel)}</td>
                       <td>{formatDuration(request.durationMinutes)}</td>
                       <td>{formatDateTime(request.createdAt)}</td>
@@ -155,6 +159,12 @@ export const MyRequests: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              <div className="wf-pagination" aria-label="My requests pagination">
+                <span>Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, visible.length)} of {visible.length}</span>
+                <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1}>Previous</button>
+                <span>Page {page} of {pageCount}</span>
+                <button type="button" className="secondary-action-btn" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount}>Next</button>
+              </div>
             </div>
           )}
         </>
