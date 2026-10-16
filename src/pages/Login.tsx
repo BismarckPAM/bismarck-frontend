@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Eye,
@@ -11,6 +11,7 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { isAdmin } from '../auth/roles';
 import { BismarckMark } from '../features/landing/Logo';
 
 /** Trust pillars shown on the showcase panel — mirrors the landing page story. */
@@ -35,7 +36,13 @@ const PILLARS = [
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+
+  const getDestination = useCallback(() => {
+    const from = (location.state as { from?: { pathname?: string } })?.from?.pathname;
+    if (from === '/users' && !isAdmin(user)) return '/dashboard';
+    return from || '/dashboard';
+  }, [location.state, user]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,13 +50,12 @@ export const Login: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already authenticated, redirect to destination or /users
+  // If already authenticated, redirect to a permitted destination.
   useEffect(() => {
     if (isAuthenticated) {
-      const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/users';
-      navigate(from, { replace: true });
+      navigate(getDestination(), { replace: true });
     }
-  }, [isAuthenticated, navigate, location]);
+  }, [isAuthenticated, navigate, getDestination]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,9 +71,7 @@ export const Login: React.FC = () => {
 
     try {
       await login({ email: trimmedEmail, password });
-      const destination =
-        (location.state as { from?: { pathname: string } })?.from?.pathname || '/users';
-      navigate(destination, { replace: true });
+      navigate(getDestination(), { replace: true });
     } catch {
       // Per specification (DOD-2): Always show a standardized error message without exposing backend details
       setErrorMessage('Invalid email or password');

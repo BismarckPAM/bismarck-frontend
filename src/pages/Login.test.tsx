@@ -19,6 +19,7 @@ const renderLoginComponent = (initialEntries = ['/login']) => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/users" element={<div data-testid="users-page">Users Dashboard</div>} />
+          <Route path="/dashboard" element={<div data-testid="dashboard-page">Dashboard</div>} />
         </Routes>
       </AuthProvider>
     </MemoryRouter>,
@@ -33,7 +34,7 @@ const makeLoginResponse = (overrides: Partial<LoginResponse> = {}): LoginRespons
     id: 'usr-001',
     fullName: 'Admin User',
     email: 'admin@bismarck.sec',
-    role: 'Administrator',
+    role: 'Admin',
     department: 'Security Operations',
   },
   ...overrides,
@@ -118,7 +119,7 @@ describe('Login Component', () => {
     await user.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.getByTestId('users-page')).toBeInTheDocument();
+      expect(screen.getByTestId('dashboard-page')).toBeInTheDocument();
     });
 
     expect(localStorage.getItem('bismarck_pam_token')).toBe('valid-jwt-token-123');
