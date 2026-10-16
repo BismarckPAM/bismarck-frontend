@@ -26,6 +26,9 @@ vi.mock('@/api/onboarding', () => ({
 
 import { LandingPage } from '../LandingPage';
 import { createOnboardingTicket } from '@/api/onboarding';
+import { useTurnstile } from '@/hooks/useTurnstile';
+
+vi.mock('@/hooks/useTurnstile', () => ({ useTurnstile: vi.fn() }));
 
 function renderLanding() {
   return render(
@@ -38,6 +41,11 @@ function renderLanding() {
 describe('LandingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useTurnstile).mockReturnValue({
+      token: 'verified-test-token',
+      isConfigured: true,
+      reset: vi.fn(),
+    });
   });
 
   it('renders hero, nav links and primary actions', () => {
@@ -84,6 +92,20 @@ describe('LandingPage', () => {
     await waitFor(() => expect(createOnboardingTicket).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/Ticket submitted/i)).toBeInTheDocument();
     expect(screen.getByText('PAM-TEST1234')).toBeInTheDocument();
+  });
+
+  it.each([true, false])('blocks unverified submissions when configured=%s', async (isConfigured) => {
+    vi.mocked(useTurnstile).mockReturnValue({ token: null, isConfigured, reset: vi.fn() });
+    renderLanding();
+    fireEvent.click(screen.getByRole('button', { name: /Raise a Ticket/i }));
+    expect(await screen.findByRole('button', { name: /Submit ticket/i })).toBeDisabled();
+    fireEvent.change(screen.getByLabelText(/Full name \*/i), { target: { value: 'Alex Kumar' } });
+    fireEvent.change(screen.getByLabelText(/Work email \*/i), { target: { value: 'alex@company.com' } });
+    fireEvent.change(screen.getByLabelText(/Requested role \*/i), { target: { value: 'User' } });
+    fireEvent.change(screen.getByLabelText(/Justification \*/i), { target: { value: 'Need access' } });
+    fireEvent.submit(document.querySelector('.lnd-form')!);
+    expect(await screen.findByRole('alert')).toHaveTextContent(/complete the human verification/i);
+    expect(createOnboardingTicket).not.toHaveBeenCalled();
   });
 
   it('closes the ticket dialog via the close button', async () => {

@@ -37,7 +37,7 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
   // Cloudflare Turnstile is only wired up while the dialog is open.
   const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY;
   const turnstile = useTurnstile(open ? sitekey : undefined, turnstileRef);
-  const captchaBlocked = turnstile.isConfigured && !turnstile.token;
+  const captchaBlocked = !turnstile.token;
 
   // Lock page scroll (Lenis + native) while open; restore on close.
   useEffect(() => {
@@ -276,7 +276,7 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
                 <div ref={turnstileRef} className="lnd-turnstile" aria-live="polite" />
               ) : (
                 <div className="lnd-notice" role="note">
-                  Human verification is disabled in this environment.
+                  Human verification is unavailable. Please try again later.
                 </div>
               )}
 
@@ -298,7 +298,7 @@ export function TicketDialog({ open, onClose, onScrollLockChange }: TicketDialog
                 <button
                   type="submit"
                   className="lnd-btn lnd-btn-primary"
-                  disabled={status === 'submitting'}
+                  disabled={status === 'submitting' || captchaBlocked}
                 >
                   {status === 'submitting' ? (
                     <>

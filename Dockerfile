@@ -12,9 +12,10 @@ ARG VITE_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainer
 ENV VITE_API_URL=$VITE_API_URL
 ARG VITE_AUTHORIZATION_API_URL=https://gateway.mangopond-f3cfcd27.southeastasia.azurecontainerapps.io
 ENV VITE_AUTHORIZATION_API_URL=$VITE_AUTHORIZATION_API_URL
-ARG VITE_TURNSTILE_SITEKEY   
+ARG VITE_TURNSTILE_SITEKEY
 ENV VITE_TURNSTILE_SITEKEY=$VITE_TURNSTILE_SITEKEY
 
+RUN test -n "$VITE_TURNSTILE_SITEKEY" || (echo "VITE_TURNSTILE_SITEKEY is required for the frontend image" >&2; exit 1)
 RUN npm run build
 
 # Stage 2: Serve with lightweight Nginx (~20MB)
