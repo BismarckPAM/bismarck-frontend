@@ -132,7 +132,16 @@ export const AppLayout: React.FC = () => {
               },
             ]
           : []),
-        { to: '/users', icon: Users, label: 'Identities & Users', aria: 'Identities and Users' },
+        ...(adminVisible
+          ? [
+              {
+                to: '/users',
+                icon: Users,
+                label: 'Identities & Users',
+                aria: 'Identities and Users',
+              },
+            ]
+          : []),
         {
           to: '/resources',
           icon: Server,

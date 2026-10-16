@@ -63,7 +63,14 @@ export const App: React.FC = () => {
                   }
                 />
                 <Route path="/notifications" element={<Notifications />} />
-                <Route path="/users" element={<Users />} />
+                <Route
+                  path="/users"
+                  element={
+                    <RequireRole allowed={isAdmin}>
+                      <Users />
+                    </RequireRole>
+                  }
+                />
                 <Route path="/resources" element={<Resources />} />
                 {/* Legacy standalone policy route, kept for backward compatibility but
                     now behind the same guard as the Admin Dashboard, so a normal

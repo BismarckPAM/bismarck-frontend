@@ -17,7 +17,7 @@ const seedAuthSession = () => {
       id: 'usr-999',
       fullName: 'Sarah Connor',
       email: 'sarah.c@bismarck.sec',
-      role: 'Security Commander',
+      role: 'Admin',
       department: 'Cyber Defense',
     }),
   );
@@ -65,7 +65,7 @@ describe('AppLayout Component & Navigation Shell', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('user-display-name')).toHaveTextContent('Sarah Connor');
-      expect(screen.getByTestId('user-display-role')).toHaveTextContent('Security Commander');
+      expect(screen.getByTestId('user-display-role')).toHaveTextContent('Admin');
     });
   });
 
@@ -137,5 +137,22 @@ describe('AppLayout Component & Navigation Shell', () => {
 
     await waitFor(() => expect(screen.getByTestId('users-content')).toBeInTheDocument());
     expect(screen.queryByRole('link', { name: /admin dashboard/i })).toBeNull();
+  });
+
+  it('hides Identities & Users from non-admin roles', async () => {
+    seedRole('Security Admin');
+    renderAppWithLayout(['/users']);
+
+    await waitFor(() => expect(screen.getByTestId('users-content')).toBeInTheDocument());
+    expect(screen.queryByRole('link', { name: /identities and users/i })).toBeNull();
+  });
+
+  it('keeps Identities & Users visible for Admin', async () => {
+    seedRole('Admin');
+    renderAppWithLayout(['/users']);
+
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: /identities and users/i })).toBeInTheDocument(),
+    );
   });
 });
